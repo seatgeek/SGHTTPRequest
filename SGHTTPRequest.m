@@ -64,7 +64,6 @@ NSMutableDictionary *gRetryQueues;
 
 - (void)start {
     if (!self.url) {
-        SGDebugLog(@"No URL!");
         return;
     }
 
