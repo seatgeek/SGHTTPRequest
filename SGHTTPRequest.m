@@ -167,6 +167,8 @@ NSMutableDictionary *gRetryQueues;
     if (requestType == SGHTTPDataTypeXML) {
         AFHTTPRequestSerializer *requestSerializer = manager.requestSerializer;
         [requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Content-Type"];
+    } else if (requestType == SGHTTPDataTypeJSON) {
+        manager.requestSerializer = AFJSONRequestSerializer.serializer;
     }
 
     if (!gReachabilityManagers[url.host]) {
