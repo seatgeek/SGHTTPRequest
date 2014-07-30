@@ -14,6 +14,7 @@ NSMutableDictionary *gOperationManagers;
 NSMutableDictionary *gReachabilityManagers;
 SGActivityIndicator *gNetworkIndicator;
 NSMutableDictionary *gRetryQueues;
+SGHTTPLogging gLogging = SGHTTPLogNothing;
 
 @interface SGHTTPRequest ()
 @property (nonatomic, weak) AFHTTPRequestOperation *operation;
@@ -68,6 +69,10 @@ NSMutableDictionary *gRetryQueues;
     }
 
     NSString *baseURL = [SGHTTPRequest baseURLFrom:self.url];
+
+    if (self.logRequest) {
+        NSLog(@"%@", self.url);
+    }
 
     AFHTTPRequestOperationManager *manager = [self.class managerForBaseURL:baseURL
           requestType:self.requestFormat responseType:self.responseFormat];
@@ -130,6 +135,7 @@ NSMutableDictionary *gRetryQueues;
     } else {
         self.responseFormat = SGHTTPDataTypeHTTP;
     }
+    self.logging = gLogging;
 
     return self;
 }
@@ -199,8 +205,14 @@ NSMutableDictionary *gRetryQueues;
     self.responseData = operation.responseData;
     self.responseString = operation.responseString;
     self.statusCode = operation.response.statusCode;
-    if (!self.cancelled && self.onSuccess) {
-        self.onSuccess(self);
+    if (!self.cancelled) {
+        if (self.logResponse) {
+            NSLog(@"%@ responded with status: %@\nResponse:%@",
+                  self.url, @(self.statusCode), self.responseString);
+        }
+        if (self.onSuccess) {
+            self.onSuccess(self);
+        }
     }
     if (self.showActivityIndicator) {
         [SGHTTPRequest.networkIndicator decrementActivityCount];
@@ -221,6 +233,12 @@ NSMutableDictionary *gRetryQueues;
     self.responseData = operation.responseData;
     self.responseString = operation.responseString;
     self.statusCode = operation.response.statusCode;
+
+    if (self.logErrors) {
+        NSLog(@"%@ failed with status: %@\nResponse:%@\nError:%@",
+              self.url, @(self.statusCode), self.responseString, error);
+    }
+
     if (self.onFailure) {
         self.onFailure(self);
     }
@@ -274,6 +292,27 @@ NSMutableDictionary *gRetryQueues;
     }
     gNetworkIndicator = [[SGActivityIndicator alloc] init];
     return gNetworkIndicator;
+}
+
+#pragma mark Logging
+
++ (void)setLogging:(SGHTTPLogging)logging {
+#ifdef DEBUG
+    // Logging in debug builds only.
+    gLogging = logging;
+#endif
+}
+
+- (BOOL)logErrors {
+    return (self.logging & SGHTTPLogErrors) || (self.logging & SGHTTPLogResponses);
+}
+
+- (BOOL)logRequest {
+    return self.logging & SGHTTPLogRequests;
+}
+
+- (BOOL)logResponse {
+    return self.logging & SGHTTPLogResponses;
 }
 
 @end

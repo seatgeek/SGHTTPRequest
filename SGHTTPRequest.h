@@ -24,6 +24,14 @@ typedef NS_OPTIONS(NSInteger, SGHTTPDataType) {
     SGHTTPDataTypeXML
 };
 
+typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
+    SGHTTPLogNothing    = 0,
+    SGHTTPLogRequests   = 1 << 0,
+    SGHTTPLogResponses  = 1 << 1,
+    SGHTTPLogErrors     = 1 << 2,
+    SGHTTPLogAll        = (SGHTTPLogRequests|SGHTTPLogResponses|SGHTTPLogErrors)
+};
+
 @interface SGHTTPRequest : NSObject
 
 /** @name Request creation */
@@ -136,6 +144,9 @@ a new identical request.
 
 /** @name Settings and options */
 
+/**
+* The URL of the HTTP request
+*/
 @property (nonatomic, strong) NSURL *url;
 
 /**
@@ -163,6 +174,19 @@ a new identical request.
 */
 @property (nonatomic, assign) SGHTTPDataType responseFormat;
 
+/**
+* Optional per-request logging (defaults to global SGHTTPRequest logging setting)
+*/
+@property (nonatomic, assign) SGHTTPLogging logging;
+
+/**
+* SGHTTP Request Logging (defaults to SGHTTPLogNothing.)  Logging is available for DEBUG builds only.
+*/
++ (void)setLogging:(SGHTTPLogging)logging;
+
+/**
+* Extracts the base URL from a given URL
+*/
 + (NSString *)baseURLFrom:(NSURL *)url;
 
 @end
