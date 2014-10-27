@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 SeatGeek. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
+
 @class SGHTTPRequest;
 
 typedef void (^SGHTTPResponseBlock)(SGHTTPRequest *req);
