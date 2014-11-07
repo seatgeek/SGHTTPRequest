@@ -25,6 +25,16 @@ SGHTTPLogging gLogging = SGHTTPLogNothing;
 @property (nonatomic, assign) BOOL cancelled;
 @end
 
+void doOnMain(void(^block)()) {
+    if (NSThread.isMainThread) { // we're on the main thread. yay
+        block();
+    } else { // we're off the main thread. Bump off.
+        dispatch_async(dispatch_get_main_queue(), ^{
+            block();
+        });
+    }
+}
+
 @implementation SGHTTPRequest
 
 #pragma mark - Public
@@ -110,14 +120,14 @@ SGHTTPLogging gLogging = SGHTTPLogNothing;
 
 - (void)cancel {
     _cancelled = YES;
-    if (self.onNetworkReachable) {
-        NSString *baseURL = [SGHTTPRequest baseURLFrom:self.url];
-        if ([[SGHTTPRequest retryQueueFor:baseURL] containsObject:self.onNetworkReachable]) {
-            [[SGHTTPRequest retryQueueFor:baseURL] removeObject:self.onNetworkReachable];
+
+    doOnMain(^{
+        if (self.onNetworkReachable) {
+           [SGHTTPRequest removeRetryCompletion:self.onNetworkReachable forHost:self.url.host];
+            self.onNetworkReachable = nil;
         }
-        self.onNetworkReachable = nil;
-    }
-    [_operation cancel]; // will call the failure block
+        [_operation cancel]; // will call the failure block
+    });
 }
 
 #pragma mark - Private
@@ -280,6 +290,13 @@ SGHTTPLogging gLogging = SGHTTPLogNothing;
     for (SGHTTPRetryBlock retryBlock in localCopy) {
         retryBlock();
     }
+}
+
++ (void)removeRetryCompletion:(SGHTTPRetryBlock)onNetworkReachable forHost:(NSString *)host {
+    doOnMain(^{
+        if ([[SGHTTPRequest retryQueueFor:host] containsObject:onNetworkReachable]) {
+            [[SGHTTPRequest retryQueueFor:host] removeObject:onNetworkReachable];
+    }});
 }
 
 + (NSString *)baseURLFrom:(NSURL *)url {
