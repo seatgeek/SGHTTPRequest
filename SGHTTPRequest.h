@@ -157,6 +157,11 @@ a new identical request.
 @property (nonatomic, strong) NSDictionary *parameters;
 
 /**
+ * An optional dictionary of HTTP header fields and values to send with the request.
+ */
+@property (nonatomic, strong) NSDictionary *httpRequestFields;
+
+/**
 * Whether to show the status bar network activity indicator or not. Default is YES.
 */
 @property (nonatomic, assign) BOOL showActivityIndicator;

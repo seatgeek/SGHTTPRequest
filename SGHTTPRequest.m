@@ -87,6 +87,10 @@ void doOnMain(void(^block)()) {
     AFHTTPRequestOperationManager *manager = [self.class managerForBaseURL:baseURL
           requestType:self.requestFormat responseType:self.responseFormat];
 
+    for (NSString *field in self.httpRequestFields) {
+        [manager.requestSerializer setValue:self.httpRequestFields[field] forHTTPHeaderField:field];
+    }
+
     id success = ^(AFHTTPRequestOperation *operation, id responseObject) {
         [self success:operation];
     };
