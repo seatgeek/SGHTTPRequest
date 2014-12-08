@@ -249,8 +249,65 @@ void doOnMain(void(^block)()) {
     self.statusCode = operation.response.statusCode;
 
     if (self.logErrors) {
-        NSLog(@"%@ failed with status: %@\nResponse:%@\nError:%@",
-              self.url, @(self.statusCode), self.responseString, error);
+        NSString *responseString = self.responseString;
+        NSObject *requestParameters = self.parameters;
+
+        if (self.responseData &&
+            [operation.responseSerializer isKindOfClass:AFJSONResponseSerializer.class] &&
+            [NSJSONSerialization isValidJSONObject:operation.responseObject]) {
+            NSError *error;
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:operation.responseObject
+                                                               options:NSJSONWritingPrettyPrinted
+                                                                 error:&error];
+            if (jsonData) {
+               responseString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+            }
+        }
+        if (self.parameters &&
+            self.requestFormat == SGHTTPDataTypeJSON &&
+            [NSJSONSerialization isValidJSONObject:self.parameters]) {
+            NSError *error;
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:self.parameters
+                                                               options:NSJSONWritingPrettyPrinted
+                                                                 error:&error];
+            if (jsonData) {
+                requestParameters = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+            }
+        }
+        NSLog(@"\n╔══════════════════════╗\n" \
+                 "║ HTTP Request failed! ║\n" \
+                 "╚══════════════════════╝\n" \
+
+                 "┌──────┐\n" \
+                 "│ URL: │\n" \
+                 "└──────┘\n" \
+                 "%@\n" \
+
+                 "┌────────────┐\n" \
+                 "│ POST Data: │\n" \
+                 "└────────────┘\n" \
+                 "%@\n" \
+
+                 "┌─────────────┐\n" \
+                 "│ Error Code: │\n" \
+                 "└─────────────┘\n" \
+                 "%@\n" \
+
+                 "┌───────────┐\n" \
+                 "│ Response: │\n" \
+                 "└───────────┘\n" \
+                 "%@\n" \
+
+                 "┌───────────┐\n" \
+                 "│ NSSError: │\n" \
+                 "└───────────┘\n" \
+                 "%@\n" \
+                 "═══════════════════════\n\n",
+                 self.url,
+                 requestParameters,
+                 @(self.statusCode),
+                 responseString,
+                 error);
     }
 
     if (self.onFailure) {
