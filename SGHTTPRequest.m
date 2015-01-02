@@ -87,8 +87,8 @@ void doOnMain(void(^block)()) {
     AFHTTPRequestOperationManager *manager = [self.class managerForBaseURL:baseURL
           requestType:self.requestFormat responseType:self.responseFormat];
 
-    for (NSString *field in self.httpRequestFields) {
-        [manager.requestSerializer setValue:self.httpRequestFields[field] forHTTPHeaderField:field];
+    for (NSString *field in self.requestHeaders) {
+        [manager.requestSerializer setValue:self.requestHeaders[field] forHTTPHeaderField:field];
     }
 
     id success = ^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -274,36 +274,42 @@ void doOnMain(void(^block)()) {
                 requestParameters = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
             }
         }
-        NSLog(@"\n╔══════════════════════╗\n" \
-                 "║ HTTP Request failed! ║\n" \
-                 "╚══════════════════════╝\n" \
+        NSLog(@"\n╔══════════════════════╗\n"
+                 "║ HTTP Request failed! ║\n"
+                 "╚══════════════════════╝\n"
 
-                 "┌──────┐\n" \
-                 "│ URL: │\n" \
-                 "└──────┘\n" \
-                 "%@\n" \
+                 "┌──────┐\n"
+                 "│ URL: │\n"
+                 "└──────┘\n"
+                 "%@\n"
 
-                 "┌────────────┐\n" \
-                 "│ POST Data: │\n" \
-                 "└────────────┘\n" \
-                 "%@\n" \
+                 "┌──────────────────┐\n"
+                 "│ Request Headers: │\n"
+                 "└──────────────────┘\n"
+                 "%@\n"
 
-                 "┌─────────────┐\n" \
-                 "│ Error Code: │\n" \
-                 "└─────────────┘\n" \
-                 "%@\n" \
+                 "┌────────────┐\n"
+                 "│ POST Data: │\n"
+                 "└────────────┘\n"
+                 "%@\n"
 
-                 "┌───────────┐\n" \
-                 "│ Response: │\n" \
-                 "└───────────┘\n" \
-                 "%@\n" \
+                 "┌─────────────┐\n"
+                 "│ Error Code: │\n"
+                 "└─────────────┘\n"
+                 "%@\n"
 
-                 "┌──────────┐\n" \
-                 "│ NSError: │\n" \
-                 "└──────────┘\n" \
-                 "%@\n" \
+                 "┌───────────┐\n"
+                 "│ Response: │\n"
+                 "└───────────┘\n"
+                 "%@\n"
+
+                 "┌──────────┐\n"
+                 "│ NSError: │\n"
+                 "└──────────┘\n"
+                 "%@\n"
                  "═══════════════════════\n\n",
                  self.url,
+                 self.requestHeaders,
                  requestParameters,
                  @(self.statusCode),
                  responseString,

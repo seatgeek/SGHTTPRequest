@@ -159,7 +159,7 @@ a new identical request.
 /**
  * An optional dictionary of HTTP header fields and values to send with the request.
  */
-@property (nonatomic, strong) NSDictionary *httpRequestFields;
+@property (nonatomic, strong) NSDictionary *requestHeaders;
 
 /**
 * Whether to show the status bar network activity indicator or not. Default is YES.
