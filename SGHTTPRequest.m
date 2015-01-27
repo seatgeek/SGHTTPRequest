@@ -329,6 +329,12 @@ void doOnMain(void(^block)()) {
 
 #pragma mark - Getters
 
+- (id)responseJSON {
+    return self.responseData
+          ? [NSJSONSerialization JSONObjectWithData:self.responseData options:0 error:nil]
+          : nil;
+}
+
 + (NSMutableArray *)retryQueueFor:(NSString *)baseURL {
     if (!baseURL) {
         return nil;
