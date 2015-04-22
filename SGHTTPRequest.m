@@ -87,6 +87,11 @@ void doOnMain(void(^block)()) {
     AFHTTPRequestOperationManager *manager = [self.class managerForBaseURL:baseURL
           requestType:self.requestFormat responseType:self.responseFormat];
 
+    if (!manager) {
+        [self failedWithError:nil operation:nil retryURL:baseURL];
+        return;
+    }
+
     for (NSString *field in self.requestHeaders) {
         [manager.requestSerializer setValue:self.requestHeaders[field] forHTTPHeaderField:field];
     }
@@ -168,14 +173,20 @@ void doOnMain(void(^block)()) {
                                         @(responseType),
                                         baseURL];
 
-    AFHTTPRequestOperationManager *manager = gOperationManagers[key];
-    if (manager) {
-        return manager;
-    }
-
+    AFHTTPRequestOperationManager *manager;
     NSURL *url = [NSURL URLWithString:baseURL];
-    manager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:url];
-    gOperationManagers[key] = manager;
+
+    @synchronized(self) {
+        manager = gOperationManagers[key];
+        if (manager) {
+            return manager;
+        }
+        manager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:url];
+        if (!manager) {
+            return nil;
+        }
+        gOperationManagers[key] = manager;
+    }
 
     //responses default to JSON
     if (responseType == SGHTTPDataTypeHTTP) {
@@ -191,7 +202,7 @@ void doOnMain(void(^block)()) {
         manager.requestSerializer = AFJSONRequestSerializer.serializer;
     }
 
-    if (!gReachabilityManagers[url.host]) {
+    if (url.host && !gReachabilityManagers[url.host]) {
         AFNetworkReachabilityManager *reacher = [AFNetworkReachabilityManager managerForDomain:url
               .host];
         gReachabilityManagers[url.host] = reacher;
@@ -321,9 +332,11 @@ void doOnMain(void(^block)()) {
     }
     self.error = nil;
 
-    if (self.onNetworkReachable) {
+    if (self.onNetworkReachable && retryURL) {
         NSURL *url = [NSURL URLWithString:retryURL];
-        [[SGHTTPRequest retryQueueFor:url.host] addObject:self.onNetworkReachable];
+        if (url.host) {
+            [[SGHTTPRequest retryQueueFor:url.host] addObject:self.onNetworkReachable];
+        }
     }
 }
 
