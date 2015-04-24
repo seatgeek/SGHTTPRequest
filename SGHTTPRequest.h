@@ -192,6 +192,11 @@ a new identical request.
 @property (nonatomic, assign) SGHTTPLogging logging;
 
 /**
+ * Reset cached internal operations and reachability managers.
+ */
++ (void)resetManagers;
+
+/**
 * SGHTTP Request Logging (defaults to SGHTTPLogNothing.)  Logging is available for DEBUG builds only.
 */
 + (void)setLogging:(SGHTTPLogging)logging;

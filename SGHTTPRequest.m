@@ -164,8 +164,7 @@ void doOnMain(void(^block)()) {
                                         responseType:(SGHTTPDataType)responseType {
     static dispatch_once_t token = 0;
     dispatch_once(&token, ^{
-        gOperationManagers = NSMutableDictionary.new;
-        gReachabilityManagers = NSMutableDictionary.new;
+        [self.class resetManagers];
     });
 
     id key = [NSString stringWithFormat:@"%@+%@+%@",
@@ -395,6 +394,13 @@ void doOnMain(void(^block)()) {
     }
     gNetworkIndicator = [[SGActivityIndicator alloc] init];
     return gNetworkIndicator;
+}
+
+#pragma mark Reset
+
++ (void)resetManagers {
+    gOperationManagers = NSMutableDictionary.new;
+    gReachabilityManagers = NSMutableDictionary.new;
 }
 
 #pragma mark Logging
