@@ -10,7 +10,6 @@
 #import "AFNetworking.h"
 #import "SGActivityIndicator.h"
 
-NSMutableDictionary *gOperationManagers;
 NSMutableDictionary *gReachabilityManagers;
 SGActivityIndicator *gNetworkIndicator;
 NSMutableDictionary *gRetryQueues;
@@ -164,28 +163,13 @@ void doOnMain(void(^block)()) {
                                         responseType:(SGHTTPDataType)responseType {
     static dispatch_once_t token = 0;
     dispatch_once(&token, ^{
-        gOperationManagers = NSMutableDictionary.new;
         gReachabilityManagers = NSMutableDictionary.new;
     });
 
-    id key = [NSString stringWithFormat:@"%@+%@+%@",
-                                        @(requestType),
-                                        @(responseType),
-                                        baseURL];
-
-    AFHTTPRequestOperationManager *manager;
     NSURL *url = [NSURL URLWithString:baseURL];
-
-    @synchronized(self) {
-        manager = gOperationManagers[key];
-        if (manager) {
-            return manager;
-        }
-        manager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:url];
-        if (!manager) {
-            return nil;
-        }
-        gOperationManagers[key] = manager;
+    AFHTTPRequestOperationManager *manager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:url];
+    if (!manager) {
+        return nil;
     }
 
     //responses default to JSON
