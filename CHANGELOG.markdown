@@ -1,3 +1,9 @@
+## 1.1.1
+
+- Wrap up non-app extension compatible code in an SG_APP_EXTENSIONS macro
+- Specify minimum requirement of AFNetworking 2.0
+- Fix potential stability issues if attempting to use an invalid URL, plus a synchronisation issue
+
 ## 1.1.0
 
 - Fancy debug error output formatting for readability. Print out request and 
