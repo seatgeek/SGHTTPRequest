@@ -122,6 +122,7 @@ void doOnMain(void(^block)()) {
         case SGHTTPRequestMethodPut:
             _operation = [manager PUT:self.url.absoluteString parameters:self.parameters
                   success:success failure:failure];
+            break;
         case SGHTTPRequestMethodPatch:
             _operation = [manager PATCH:self.url.absoluteString parameters:self.parameters
                   success:success failure:failure];
