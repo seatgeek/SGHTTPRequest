@@ -79,7 +79,7 @@ void doOnMain(void(^block)()) {
 
     NSString *baseURL = [SGHTTPRequest baseURLFrom:self.url];
 
-    if (self.logRequest) {
+    if (self.logRequests) {
         NSLog(@"%@", self.url);
     }
 
@@ -215,9 +215,8 @@ void doOnMain(void(^block)()) {
     self.responseString = operation.responseString;
     self.statusCode = operation.response.statusCode;
     if (!self.cancelled) {
-        if (self.logResponse) {
-            NSLog(@"%@ responded with status: %@\nResponse:%@",
-                  self.url, @(self.statusCode), self.responseString);
+        if (self.logResponses) {
+            [self logResponse:operation error:nil];
         }
         if (self.onSuccess) {
             self.onSuccess(self);
@@ -244,71 +243,7 @@ void doOnMain(void(^block)()) {
     self.statusCode = operation.response.statusCode;
 
     if (self.logErrors) {
-        NSString *responseString = self.responseString;
-        NSObject *requestParameters = self.parameters;
-
-        if (self.responseData &&
-            [operation.responseSerializer isKindOfClass:AFJSONResponseSerializer.class] &&
-            [NSJSONSerialization isValidJSONObject:operation.responseObject]) {
-            NSError *error;
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:operation.responseObject
-                                                               options:NSJSONWritingPrettyPrinted
-                                                                 error:&error];
-            if (jsonData) {
-               responseString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-            }
-        }
-        if (self.parameters &&
-            self.requestFormat == SGHTTPDataTypeJSON &&
-            [NSJSONSerialization isValidJSONObject:self.parameters]) {
-            NSError *error;
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:self.parameters
-                                                               options:NSJSONWritingPrettyPrinted
-                                                                 error:&error];
-            if (jsonData) {
-                requestParameters = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-            }
-        }
-        NSLog(@"\n╔══════════════════════╗\n"
-                 "║ HTTP Request failed! ║\n"
-                 "╚══════════════════════╝\n"
-
-                 "┌──────┐\n"
-                 "│ URL: │\n"
-                 "└──────┘\n"
-                 "%@\n"
-
-                 "┌──────────────────┐\n"
-                 "│ Request Headers: │\n"
-                 "└──────────────────┘\n"
-                 "%@\n"
-
-                 "┌────────────┐\n"
-                 "│ POST Data: │\n"
-                 "└────────────┘\n"
-                 "%@\n"
-
-                 "┌─────────────┐\n"
-                 "│ Error Code: │\n"
-                 "└─────────────┘\n"
-                 "%@\n"
-
-                 "┌───────────┐\n"
-                 "│ Response: │\n"
-                 "└───────────┘\n"
-                 "%@\n"
-
-                 "┌──────────┐\n"
-                 "│ NSError: │\n"
-                 "└──────────┘\n"
-                 "%@\n"
-                 "═══════════════════════\n\n",
-                 self.url,
-                 self.requestHeaders,
-                 requestParameters,
-                 @(self.statusCode),
-                 responseString,
-                 error);
+        [self logResponse:operation error:error];
     }
 
     if (self.onFailure) {
@@ -390,15 +325,92 @@ void doOnMain(void(^block)()) {
 #endif
 }
 
+- (void)logResponse:(AFHTTPRequestOperation *)operation error:(NSError *)error {
+    NSString *responseString = self.responseString;
+    NSObject *requestParameters = self.parameters;
+
+    if (self.responseData &&
+        [operation.responseSerializer isKindOfClass:AFJSONResponseSerializer.class] &&
+        [NSJSONSerialization isValidJSONObject:operation.responseObject]) {
+        NSError *error;
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:operation.responseObject
+                                                           options:NSJSONWritingPrettyPrinted
+                                                             error:&error];
+        if (jsonData) {
+            responseString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        }
+    }
+    if (self.parameters &&
+        self.requestFormat == SGHTTPDataTypeJSON &&
+        [NSJSONSerialization isValidJSONObject:self.parameters]) {
+        NSError *error;
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:self.parameters
+                                                           options:NSJSONWritingPrettyPrinted
+                                                             error:&error];
+        if (jsonData) {
+            requestParameters = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        }
+    }
+
+    NSMutableString *output = NSMutableString.new;
+
+    if (error) {
+        [output appendString:@"\n╔══════════════════════╗\n"
+                                "║ HTTP Request failed! ║\n"
+                                "╚══════════════════════╝\n" ];
+    } else {
+        [output appendString:@"\n╔════════════════════════╗\n"
+                                "║ HTTP Request succeeded ║\n"
+                                "╚════════════════════════╝\n" ];
+    }
+
+    [output appendFormat:@"┌──────┐\n"
+                          "│ URL: │\n"
+                          "└──────┘\n"
+                          "%@\n"
+                          "┌──────────────────┐\n"
+                          "│ Request Headers: │\n"
+                          "└──────────────────┘\n"
+                          "%@\n"
+                          "┌────────────┐\n"
+                          "│ POST Data: │\n"
+                          "└────────────┘\n"
+                          "%@\n"
+                          "┌──────────────┐\n"
+                          "│ Status Code: │\n"
+                          "└──────────────┘\n"
+                          "%@\n"
+                          "┌───────────┐\n"
+                          "│ Response: │\n"
+                          "└───────────┘\n"
+                          "%@\n",
+     self.url,
+     self.requestHeaders,
+     requestParameters,
+     @(self.statusCode),
+     responseString];
+
+    if (error) {
+        [output appendFormat:@"┌──────────┐\n"
+                              "│ NSError: │\n"
+                              "└──────────┘\n"
+                              "%@\n",
+                            error];
+    }
+
+    [output appendString:@"═══════════════════════\n\n"];
+    NSLog(@"%@", output);
+}
+
 - (BOOL)logErrors {
     return (self.logging & SGHTTPLogErrors) || (self.logging & SGHTTPLogResponses);
 }
 
-- (BOOL)logRequest {
+- (BOOL)logRequests {
     return self.logging & SGHTTPLogRequests;
 }
 
-- (BOOL)logResponse {
+- (BOOL)logResponses {
     return self.logging & SGHTTPLogResponses;
 }
 
