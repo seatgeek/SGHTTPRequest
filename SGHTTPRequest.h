@@ -17,7 +17,8 @@ typedef NS_OPTIONS(NSInteger, SGHTTPRequestMethod) {
     SGHTTPRequestMethodGet,
     SGHTTPRequestMethodPost,
     SGHTTPRequestMethodDelete,
-    SGHTTPRequestMethodPut
+    SGHTTPRequestMethodPut,
+    SGHTTPRequestMethodPatch
 };
 
 typedef NS_OPTIONS(NSInteger, SGHTTPDataType) {
@@ -63,6 +64,11 @@ typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
 * Returns a new PUT request instance for the given URL.
 */
 + (instancetype)putRequestWithURL:(NSURL *)url;
+
+/**
+* Returns a new PATCH request instance for the given URL.
+*/
++ (instancetype)patchRequestWithURL:(NSURL *)url;
 
 /**
 * Returns a new POST request instance for the given URL, configured to send the

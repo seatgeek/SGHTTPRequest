@@ -60,6 +60,10 @@ void doOnMain(void(^block)()) {
     return [[self alloc] initWithURL:url method:SGHTTPRequestMethodPut];
 }
 
++ (instancetype)patchRequestWithURL:(NSURL *)url {
+    return [[self alloc] initWithURL:url method:SGHTTPRequestMethodPatch];
+}
+
 + (instancetype)xmlPostRequestWithURL:(NSURL *)url {
     SGHTTPRequest *request =  [[self alloc] initWithURL:url method:SGHTTPRequestMethodPut];
     request.requestFormat = SGHTTPDataTypeXML;
@@ -117,6 +121,9 @@ void doOnMain(void(^block)()) {
             break;
         case SGHTTPRequestMethodPut:
             _operation = [manager PUT:self.url.absoluteString parameters:self.parameters
+                  success:success failure:failure];
+        case SGHTTPRequestMethodPatch:
+            _operation = [manager PATCH:self.url.absoluteString parameters:self.parameters
                   success:success failure:failure];
             break;
     }
