@@ -335,9 +335,34 @@ void doOnMain(void(^block)()) {
 #endif
 }
 
+- (NSString *)boxUpString:(NSString *)string fatLine:(BOOL)fatLine {
+    NSMutableString *boxString = NSMutableString.new;
+    NSInteger charsInLine = string.length + 4;
+
+    if (fatLine) {
+        [boxString appendString:@"\n╔"];
+        [boxString appendString:[@"" stringByPaddingToLength:charsInLine - 2 withString:@"═" startingAtIndex:0]];
+        [boxString appendString:@"╗\n"];
+        [boxString appendString:[NSString stringWithFormat:@"║ %@ ║\n", string]];
+        [boxString appendString:@"╚"];
+        [boxString appendString:[@"" stringByPaddingToLength:charsInLine - 2 withString:@"═" startingAtIndex:0]];
+        [boxString appendString:@"╝\n"];
+    } else {
+        [boxString appendString:@"\n┌"];
+        [boxString appendString:[@"" stringByPaddingToLength:charsInLine - 2 withString:@"─" startingAtIndex:0]];
+        [boxString appendString:@"┐\n"];
+        [boxString appendString:[NSString stringWithFormat:@"│ %@ │\n", string]];
+        [boxString appendString:@"└"];
+        [boxString appendString:[@"" stringByPaddingToLength:charsInLine - 2 withString:@"─" startingAtIndex:0]];
+        [boxString appendString:@"┘\n"];
+    }
+    return boxString;
+}
+
 - (void)logResponse:(AFHTTPRequestOperation *)operation error:(NSError *)error {
     NSString *responseString = self.responseString;
     NSObject *requestParameters = self.parameters;
+    NSString *requestMethod = operation.request.HTTPMethod ?: @"";
 
     if (self.responseData &&
         [operation.responseSerializer isKindOfClass:AFJSONResponseSerializer.class] &&
@@ -365,51 +390,32 @@ void doOnMain(void(^block)()) {
     NSMutableString *output = NSMutableString.new;
 
     if (error) {
-        [output appendString:@"\n╔══════════════════════╗\n"
-                                "║ HTTP Request failed! ║\n"
-                                "╚══════════════════════╝\n" ];
+        [output appendString:[self boxUpString:[NSString stringWithFormat:@"HTTP %@ Request failed!", requestMethod]
+                                       fatLine:YES]];
     } else {
-        [output appendString:@"\n╔════════════════════════╗\n"
-                                "║ HTTP Request succeeded ║\n"
-                                "╚════════════════════════╝\n" ];
+        [output appendString:[self boxUpString:[NSString stringWithFormat:@"HTTP %@ Request succeeded", requestMethod]
+                                       fatLine:YES]];
     }
+    [output appendString:[self boxUpString:@"URL:" fatLine:NO]];
+    [output appendString:[NSString stringWithFormat:@"%@", self.url]];
+    [output appendString:[self boxUpString:@"Request Headers:" fatLine:NO]];
+    [output appendString:[NSString stringWithFormat:@"%@", self.requestHeaders]];
 
-    [output appendFormat:@"┌──────┐\n"
-                          "│ URL: │\n"
-                          "└──────┘\n"
-                          "%@\n"
-                          "┌──────────────────┐\n"
-                          "│ Request Headers: │\n"
-                          "└──────────────────┘\n"
-                          "%@\n"
-                          "┌────────────┐\n"
-                          "│ POST Data: │\n"
-                          "└────────────┘\n"
-                          "%@\n"
-                          "┌──────────────┐\n"
-                          "│ Status Code: │\n"
-                          "└──────────────┘\n"
-                          "%@\n"
-                          "┌───────────┐\n"
-                          "│ Response: │\n"
-                          "└───────────┘\n"
-                          "%@\n",
-     self.url,
-     self.requestHeaders,
-     requestParameters,
-     @(self.statusCode),
-     responseString];
+    // this prints out POST Data: / PUT data: etc
+    [output appendString:[self boxUpString:[NSString stringWithFormat:@"%@ Data:", requestMethod]
+                                    fatLine:NO]];
+    [output appendString:[NSString stringWithFormat:@"%@", requestParameters]];
+    [output appendString:[self boxUpString:@"Status Code:" fatLine:NO]];
+    [output appendString:[NSString stringWithFormat:@"%@", @(self.statusCode)]];
+    [output appendString:[self boxUpString:@"Response:" fatLine:NO]];
+    [output appendString:[NSString stringWithFormat:@"%@", responseString]];
 
     if (error) {
-        [output appendFormat:@"┌──────────┐\n"
-                              "│ NSError: │\n"
-                              "└──────────┘\n"
-                              "%@\n",
-                            error];
+        [output appendString:[self boxUpString:@"NSError:" fatLine:NO]];
+        [output appendString:[NSString stringWithFormat:@"%@", error]];
     }
-
-    [output appendString:@"═══════════════════════\n\n"];
-    NSLog(@"%@", output);
+    [output appendString:@"\n═══════════════════════\n\n"];
+    NSLog(@"%@", [NSString stringWithString:output]);
 }
 
 - (BOOL)logErrors {
