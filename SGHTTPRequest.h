@@ -37,6 +37,8 @@ typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
 
 @interface SGHTTPRequest : NSObject
 
+#pragma mark Request Creation
+
 /** @name Request creation */
 
 /**
@@ -82,10 +84,14 @@ typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
 */
 + (instancetype)xmlRequestWithURL:(NSURL *)url;
 
+#pragma mark Starting and Stopping
+
 /** @name Starting and Stopping */
 
 - (void)start;
 - (void)cancel;
+
+#pragma mark State change callbacks
 
 /** @name State change callbacks */
 
@@ -128,6 +134,8 @@ a new identical request.
 */
 @property (nonatomic, copy) SGHTTPRetryBlock onNetworkReachable;
 
+#pragma mark Response data and errors
+
 /** @name Response data and errors */
 
 /**
@@ -154,6 +162,8 @@ a new identical request.
 * An error object available on failed requests.
 */
 - (NSError *)error;
+
+#pragma mark Settings and Options
 
 /** @name Settings and options */
 
@@ -206,5 +216,43 @@ a new identical request.
 * Extracts the base URL from a given URL
 */
 + (NSString *)baseURLFrom:(NSURL *)url;
+
+#pragma mark ETag Caching
+/** @name ETag Caching */
+
+/**
+ * Sets the default setting for whether new HTTP requests can be cached to disk.
+ * This can be overridden with the `allowCacheToDisk` property on a
+ * SGHTTPRequst object for per http request granularity.
+ * Caching is based on the HTTP ETag.  Default is NO.
+ */
++ (void)setAllowCacheToDisk:(BOOL)allowCacheToDisk;
+
+/**
+ * The default setting for whether new HTTP requests can be cached to disk.
+ * Default is NO.
+ */
+
++ (BOOL)allowCacheToDisk;
+
+/**
+ * Whether successful responses are allowed to be cached to disk.
+ * Caching is based on the HTTP ETag.  Defaults to SGHTTPRequest.allowCacheToDisk
+ */
+@property (nonatomic, assign) BOOL allowCacheToDisk;
+
+/**
+ * Sets the maximum size for the ETag disk cache.  Defaults to 20MB.  For unlimited,
+ * set to zero.
+ */
++ (void)setMaxDiskCacheSize:(NSUInteger)megaBytes;
+
+/**
+ * The HTTP ETag value (optional).  Can be used for response caching.
+ * This is automatically used if the server responds with an ETag value.
+ * If `allowCacheToDisk` is YES, then the response data will be cached
+ * to disk and keyed by it's ETag.
+ */
+@property (nonatomic, strong) NSString *eTag;
 
 @end

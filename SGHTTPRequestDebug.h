@@ -1,0 +1,23 @@
+//
+//  SGHTTPRequestDebug.h
+//  Pods
+//
+//  Created by James Van-As on 22/06/15.
+//
+//
+
+#import <Foundation/Foundation.h>
+
+#define SGHTTPAssert(condition, desc, ...) \
+    if (!(condition)) { \
+        NSLog(@"%@",[NSString stringWithFormat:(desc), ##__VA_ARGS__]); \
+        if (SGHTTPRequestDebug.runningInDebugger) \
+            kill (getpid(), SIGSTOP); \
+        else { \
+            NSLog(@"%s, %d: could not break into debugger.", __FILE__, __LINE__); \
+        } \
+    }
+
+@interface SGHTTPRequestDebug : NSObject
++ (BOOL)runningInDebugger;
+@end
