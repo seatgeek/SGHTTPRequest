@@ -248,6 +248,17 @@ a new identical request.
 + (void)setMaxDiskCacheSize:(NSUInteger)megaBytes;
 
 /**
+ * Sets the default max-age of cached http responses.  
+ * Defaults to 30 days (2592000 seconds)
+ */
++ (void)setDefaultCacheMaxAge:(NSTimeInterval)timeToExpire;
+
+/**
+ * Clears the Etag disk cache completely.
+ */
++ (void)clearCache;
+
+/**
  * The HTTP ETag value (optional).  Can be used for response caching.
  * This is automatically used if the server responds with an ETag value.
  * If `allowCacheToDisk` is YES, then the response data will be cached

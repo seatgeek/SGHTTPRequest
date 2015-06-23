@@ -11,7 +11,10 @@
 #import "SGActivityIndicator.h"
 #import "SGHTTPRequestDebug.h"
 
-#define ETAG_CACHE_PATH @"SGHTTPRequestETagCache"
+#define ETAG_CACHE_PATH     @"SGHTTPRequestETagCache"
+#define SGETag              @"eTag"
+#define SGResponseDataPath  @"dataPath"
+#define SGExpiryDate        @"expires"
 
 NSMutableDictionary *gReachabilityManagers;
 SGActivityIndicator *gNetworkIndicator;
@@ -101,6 +104,8 @@ void doOnMain(void(^block)()) {
     for (NSString *field in self.requestHeaders) {
         [manager.requestSerializer setValue:self.requestHeaders[field] forHTTPHeaderField:field];
     }
+
+    [self removeCacheFilesIfExpired];
 
     if (self.eTag.length) {
         [manager.requestSerializer setValue:self.eTag forHTTPHeaderField:@"If-None-Match"];
@@ -240,13 +245,41 @@ void doOnMain(void(^block)()) {
         if (self.logResponses) {
             [self logResponse:operation error:nil];
         }
-        NSString *eTag = operation.response.allHeaderFields[@"Etag"];
+        NSDictionary *reponseHeader = operation.response.allHeaderFields;
+        NSString *eTag = reponseHeader[@"Etag"];
+        NSString *cacheControlPolicy = reponseHeader[@"Cache-Control"];
+        if ([cacheControlPolicy containsString:@"no-cache"] ||
+            [cacheControlPolicy containsString:@"no-store"] ||
+            [cacheControlPolicy containsString:@"private"]) {
+            self.allowCacheToDisk = NO;
+        }
+        NSDate *expiryDate = SGHTTPRequest.defaultCacheMaxAge > 0 ?
+                             [NSDate dateWithTimeIntervalSinceNow:SGHTTPRequest.defaultCacheMaxAge] : nil;
+        if ([cacheControlPolicy containsString:@"max-age"]) {
+            NSError *error;
+            NSRegularExpression *regex = [NSRegularExpression
+                                          regularExpressionWithPattern:@"(max-age=)(\\d+)"
+                                          options:NSRegularExpressionCaseInsensitive
+                                          error:&error];
+            NSTextCheckingResult *match = [regex firstMatchInString:cacheControlPolicy
+                                                            options:0
+                                                              range:NSMakeRange(0, cacheControlPolicy.length)];
+            if (match) {
+                NSString *maxAge = [cacheControlPolicy substringWithRange:match.range];
+                NSArray *maxAgeComponents = [maxAge componentsSeparatedByString:@"="];
+                if (maxAgeComponents.count == 2) {
+                    NSString *maxAgeValueString = maxAgeComponents[1];
+                    NSTimeInterval expiryInterval = maxAgeValueString.doubleValue;
+                    expiryDate = [NSDate dateWithTimeIntervalSinceNow:expiryInterval];
+                }
+            }
+        }
         if (eTag.length) {
             if (self.statusCode == 304) {
                 if (!self.responseData.length && self.allowCacheToDisk) {
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                         // If we got a 304 and no respose from iOS level caching, check the disk.
-                        NSData *cachedData = [self cachedDataForETag:eTag];
+                        NSData *cachedData = [self cachedDataForETag:eTag newExpiryDate:expiryDate];
                         dispatch_async(dispatch_get_main_queue(), ^{
                             if (cachedData) {
                                 self.responseData = cachedData;
@@ -265,8 +298,11 @@ void doOnMain(void(^block)()) {
                 }
             } else if (self.allowCacheToDisk) {
                 // response has changed.  Let's cache the new version.
-                [self cacheDataForETag:eTag];
+                [self cacheDataForETag:eTag expiryDate:expiryDate];
             }
+        }
+        if (!self.allowCacheToDisk) {
+            [self removeCacheFiles];
         }
         self.eTag = eTag;
         if (self.onSuccess) {
@@ -373,21 +409,34 @@ void doOnMain(void(^block)()) {
     if (_allowCacheToDisk && !_eTag) {
         NSString *indexPath = self.pathForCachedIndex;
         NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexPath];
-        _eTag = index[@"eTag"];
+        _eTag = index[SGETag];
     }
     return _eTag;
 }
 
-- (NSData *)cachedDataForETag:(NSString *)eTag {
+- (NSData *)cachedDataForETag:(NSString *)eTag newExpiryDate:(NSDate *)newExpiryDate {
     if (!self.url) {
         return nil;
     }
     NSString *indexPath = self.pathForCachedIndex;
     NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexPath];
-    if (![index[@"eTag"] isEqualToString:eTag] || !index[@"dataPath"]) {
+    if (![index[SGETag] isEqualToString:eTag] || !index[SGResponseDataPath]) {
         return nil;
     }
-    NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[@"dataPath"]];
+
+    if ((index[SGExpiryDate] && !newExpiryDate) ||
+        (newExpiryDate && !index[SGExpiryDate]) ||
+        (newExpiryDate && index[SGExpiryDate] && ![newExpiryDate isEqualToDate:index[SGExpiryDate]])) {
+        NSMutableDictionary *newIndex = index.mutableCopy;
+        if (newExpiryDate) {
+            newIndex[SGExpiryDate] = newExpiryDate;
+        } else {
+            [newIndex removeObjectForKey:SGExpiryDate];
+        }
+        [newIndex writeToFile:indexPath atomically:YES];
+    }
+
+    NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[SGResponseDataPath]];
     if (![NSFileManager.defaultManager fileExistsAtPath:fullDataPath]) {
       return nil;
     }
@@ -399,7 +448,7 @@ void doOnMain(void(^block)()) {
     return [NSData dataWithContentsOfFile:fullDataPath];
 }
 
-- (void)cacheDataForETag:(NSString *)eTag {
+- (void)cacheDataForETag:(NSString *)eTag expiryDate:(NSDate *)expiryDate {
     SGHTTPAssert([NSThread isMainThread], @"This must be run from the main thread");
     if (!self.url || !eTag.length) {
         return;
@@ -421,8 +470,8 @@ void doOnMain(void(^block)()) {
     NSString *fullDataPath = nil;
 
     NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexPath];
-    if (index[@"dataPath"]) {
-        fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[@"dataPath"]];
+    if (index[SGResponseDataPath]) {
+        fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[SGResponseDataPath]];
     }
     // delete the index file before the data file.  Noone should reference the data file without the index file.
     if ([NSFileManager.defaultManager fileExistsAtPath:indexPath]) {
@@ -447,24 +496,45 @@ void doOnMain(void(^block)()) {
         if (![data writeToFile:fullDataPath atomically:YES]) {
             return;
         }
-        NSDictionary *newIndex = @{@"eTag"     : eTag,
-                                   @"dataPath" : shortDataPath};
+
+        NSMutableDictionary *newIndex = @{SGETag : eTag,
+                                          SGResponseDataPath : shortDataPath}.mutableCopy;
+        if (expiryDate) {
+            newIndex[SGExpiryDate] = expiryDate;
+        }
         [newIndex writeToFile:indexPath atomically:YES];
     });
 }
 
-- (void)removeCacheFiles {
-    SGHTTPAssert([NSThread isMainThread], @"This must be run from the main thread");
-    NSString *indexPath = self.pathForCachedIndex;
++ (void)removeCacheFilesForIndexPath:(NSString *)indexPath {
     NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexPath];
-    if (index[@"dataPath"]) {
-        NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[@"dataPath"]];
+    if (index[SGResponseDataPath]) {
+        NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[SGResponseDataPath]];
         if ([NSFileManager.defaultManager fileExistsAtPath:fullDataPath]) {
             [NSFileManager.defaultManager removeItemAtPath:fullDataPath error:nil];
         }
     }
     if ([NSFileManager.defaultManager fileExistsAtPath:indexPath]) {
         [NSFileManager.defaultManager removeItemAtPath:indexPath error:nil];
+    }
+}
+
++ (BOOL)removeCacheFilesIfExpiredForIndexPath:(NSString *)indexPath {
+    NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexPath];
+    if ([(NSDate *)index[SGExpiryDate] compare:NSDate.date] == NSOrderedAscending) {
+        [self removeCacheFilesForIndexPath:indexPath];
+        return YES;
+    }
+    return NO;
+}
+
+- (void)removeCacheFiles {
+    [SGHTTPRequest removeCacheFilesForIndexPath:self.pathForCachedIndex];
+}
+
+- (void)removeCacheFilesIfExpired {
+    if ([SGHTTPRequest removeCacheFilesIfExpiredForIndexPath:self.pathForCachedIndex]) {
+        self.eTag = nil;
     }
 }
 
@@ -553,8 +623,8 @@ void doOnMain(void(^block)()) {
         NSString *indexPathToDelete = nil;
         for (NSString *indexFilePath in indexFilesArray) {
             NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexFilePath];
-            if (index[@"dataPath"]) {
-                NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[@"dataPath"]];
+            if (index[SGResponseDataPath]) {
+                NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[SGResponseDataPath]];
 
                 if ([fullDataPath isEqualToString:dataFilePath]) {
                     indexPathToDelete = indexFilePath;
@@ -574,45 +644,79 @@ void doOnMain(void(^block)()) {
     }
 }
 
-+ (NSString *)cacheFolder {
-    NSString *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask,
-                                                         YES)[0];
-    path = [path stringByAppendingFormat:@"/%@", ETAG_CACHE_PATH];
++ (void)clearCache {
+    SGHTTPAssert([NSThread isMainThread], @"This must be run from the main thread");
 
+    NSString *indexFolder = self.cacheFolder;
+    NSMutableArray *indexFileNamesArray = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:indexFolder error:nil].mutableCopy;
+    NSMutableArray *indexFilesArray = NSMutableArray.new;
+    for (NSString *indexFileName in indexFileNamesArray) {
+        [indexFilesArray addObject:[indexFolder stringByAppendingPathComponent:indexFileName]];
+    }
+
+    for (NSString *filePath in indexFilesArray) {
+        if ([NSFileManager.defaultManager fileExistsAtPath:filePath]) {
+            [NSFileManager.defaultManager removeItemAtPath:filePath error:nil];
+        }
+    }
+
+    NSString *dataFolder = [self.cacheFolder stringByAppendingString:@"/Data"];
+    NSArray *dataFilesNamesArray = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:dataFolder error:nil];
+    NSMutableArray *dataFilesArray = NSMutableArray.new;
+    for (NSString *dataFileName in dataFilesNamesArray) {
+        [dataFilesArray addObject:[dataFolder stringByAppendingPathComponent:dataFileName]];
+    }
+
+    for (NSString *filePath in dataFilesArray) {
+        if ([NSFileManager.defaultManager fileExistsAtPath:filePath]) {
+            [NSFileManager.defaultManager removeItemAtPath:filePath error:nil];
+        }
+    }
+}
+
++ (void)clearExpiredFiles {
+    NSString *cacheFolder = self.cacheFolder;
+    NSTimeInterval age = SGHTTPRequest.defaultCacheMaxAge; // trash files older than 30 days
+    NSArray *files = [NSFileManager.defaultManager contentsOfDirectoryAtPath:cacheFolder error:nil];
+
+    for (NSString *file in files) {
+        if ([file isEqualToString:@"."] || [file isEqualToString:@".."]) {
+            continue;
+        }
+        NSString *indexFile = [cacheFolder stringByAppendingPathComponent:file];
+        NSDate *created = [NSFileManager.defaultManager attributesOfItemAtPath:cacheFolder error:nil].fileCreationDate;
+
+        // too old. delete it
+        if (age > 0 && -created.timeIntervalSinceNow > age) {
+            NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexFile];
+            if (index[SGResponseDataPath]) {
+                NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", cacheFolder, index[SGResponseDataPath]];
+                if ([NSFileManager.defaultManager fileExistsAtPath:fullDataPath]) {
+                    [NSFileManager.defaultManager removeItemAtPath:fullDataPath error:nil];
+                }
+            }
+            [NSFileManager.defaultManager removeItemAtPath:indexFile error:nil];
+        } else {
+            [self removeCacheFilesIfExpiredForIndexPath:indexFile];
+        }
+    }
+}
+
++ (NSString *)cacheFolder {
+    static NSString *gCacheFolder;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        gCacheFolder = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask,
+                                                         YES)[0];
+        gCacheFolder = [gCacheFolder stringByAppendingFormat:@"/%@", ETAG_CACHE_PATH];
         BOOL isDir;
-        NSString *dataPath = [path stringByAppendingString:@"/Data"];
+        NSString *dataPath = [gCacheFolder stringByAppendingString:@"/Data"];
         if (![NSFileManager.defaultManager fileExistsAtPath:dataPath isDirectory:&isDir]) {
             [NSFileManager.defaultManager createDirectoryAtPath:dataPath withIntermediateDirectories:YES
                                                      attributes:nil error:nil];
         }
-
-        NSTimeInterval age = 60 * 60 * 12 * 30; // trash files older than 30 days
-        NSArray *files = [NSFileManager.defaultManager contentsOfDirectoryAtPath:path error:nil];
-
-        for (NSString *file in files) {
-            if ([file isEqualToString:@"."] || [file isEqualToString:@".."]) {
-                continue;
-            }
-
-            NSString *indexFile = [path stringByAppendingPathComponent:file];
-            NSDate *created = [NSFileManager.defaultManager attributesOfItemAtPath:path error:nil].fileCreationDate;
-
-            // too old. delete it
-            if (-created.timeIntervalSinceNow > age) {
-                NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexFile];
-                if (index[@"dataPath"]) {
-                    NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", path, index[@"dataPath"]];
-                    if ([NSFileManager.defaultManager fileExistsAtPath:fullDataPath]) {
-                        [NSFileManager.defaultManager removeItemAtPath:fullDataPath error:nil];
-                    }
-                }
-                [NSFileManager.defaultManager removeItemAtPath:indexFile error:nil];
-            }
-        }
     });
-    return path;
+    return gCacheFolder;
 }
 
 static BOOL gAllowCacheToDisk = NO;
@@ -637,6 +741,20 @@ static NSUInteger gMaxDiskCacheSize = 20;
 
 + (NSInteger)maxDiskCacheSizeBytes {
     return self.maxDiskCacheSize * 1024 * 1024;
+}
+
+static NSUInteger gDefaultCacheMaxAge = 2592000;
+
++ (void)setDefaultCacheMaxAge:(NSTimeInterval)timeToExpire {
+    gDefaultCacheMaxAge = timeToExpire;
+}
+
++ (NSTimeInterval)defaultCacheMaxAge {
+    return gDefaultCacheMaxAge;
+}
+
++ (void)initialize {
+    [self clearExpiredFiles];
 }
 
 #pragma mark - Logging
