@@ -259,7 +259,6 @@ void doOnMain(void(^block)()) {
                                 [self removeCacheFiles];
                                 [self start];   //cached data is missing. try again without eTag
                             }
-
                         });
                     });
                     return;
@@ -368,7 +367,7 @@ void doOnMain(void(^block)()) {
     return gNetworkIndicator;
 }
 
-#pragma mark ETag Caching
+#pragma mark - ETag Caching
 
 - (NSString *)eTag {
     if (_allowCacheToDisk && !_eTag) {
@@ -392,6 +391,11 @@ void doOnMain(void(^block)()) {
     if (![NSFileManager.defaultManager fileExistsAtPath:fullDataPath]) {
       return nil;
     }
+
+    // touch the date modified timestamp
+    [NSFileManager.defaultManager setAttributes:@{NSFileModificationDate:NSDate.date}
+                       ofItemAtPath:fullDataPath
+                         error:nil];
     return [NSData dataWithContentsOfFile:fullDataPath];
 }
 
@@ -635,7 +639,7 @@ static NSUInteger gMaxDiskCacheSize = 20;
     return self.maxDiskCacheSize * 1024 * 1024;
 }
 
-#pragma mark Logging
+#pragma mark - Logging
 
 + (void)setLogging:(SGHTTPLogging)logging {
 #ifdef DEBUG
