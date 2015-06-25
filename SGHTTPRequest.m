@@ -550,7 +550,7 @@ void doOnMain(void(^block)()) {
         fileSize += [[NSFileManager defaultManager] attributesOfItemAtPath:[dataFolder stringByAppendingPathComponent:fileName]
                                                                                         error:nil].fileSize;
     }
-    return fileSize;
+    return (NSUInteger)fileSize;
 }
 
 + (void)purgeOldestCacheFilesLeaving:(NSInteger)bytesFree {
