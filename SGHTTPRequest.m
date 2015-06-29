@@ -10,6 +10,7 @@
 #import "AFNetworking.h"
 #import "SGActivityIndicator.h"
 #import "SGHTTPRequestDebug.h"
+#import "NSString+SGHTTPRequest.h"
 
 #define ETAG_CACHE_PATH     @"SGHTTPRequestETagCache"
 #define SGETag              @"eTag"
@@ -248,14 +249,14 @@ void doOnMain(void(^block)()) {
         NSDictionary *reponseHeader = operation.response.allHeaderFields;
         NSString *eTag = reponseHeader[@"Etag"];
         NSString *cacheControlPolicy = reponseHeader[@"Cache-Control"];
-        if ([cacheControlPolicy containsString:@"no-cache"] ||
-            [cacheControlPolicy containsString:@"no-store"] ||
-            [cacheControlPolicy containsString:@"private"]) {
+        if ([cacheControlPolicy containsSubstring:@"no-cache"] ||
+            [cacheControlPolicy containsSubstring:@"no-store"] ||
+            [cacheControlPolicy containsSubstring:@"private"]) {
             self.allowCacheToDisk = NO;
         }
         NSDate *expiryDate = SGHTTPRequest.defaultCacheMaxAge > 0 ?
                              [NSDate dateWithTimeIntervalSinceNow:SGHTTPRequest.defaultCacheMaxAge] : nil;
-        if ([cacheControlPolicy containsString:@"max-age"]) {
+        if ([cacheControlPolicy containsSubstring:@"max-age"]) {
             NSError *error;
             NSRegularExpression *regex = [NSRegularExpression
                                           regularExpressionWithPattern:@"(max-age=)(\\d+)"
