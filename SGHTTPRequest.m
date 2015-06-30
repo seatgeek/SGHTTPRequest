@@ -239,6 +239,10 @@ void doOnMain(void(^block)()) {
 #pragma mark - Success / Fail Handlers
 
 - (void)success:(AFHTTPRequestOperation *)operation {
+    if (self.showActivityIndicator) {
+        [SGHTTPRequest.networkIndicator decrementActivityCount];
+    }
+
     self.responseData = operation.responseData;
     self.responseString = operation.responseString;
     self.statusCode = operation.response.statusCode;
@@ -309,9 +313,6 @@ void doOnMain(void(^block)()) {
         if (self.onSuccess) {
             self.onSuccess(self);
         }
-    }
-    if (self.showActivityIndicator) {
-        [SGHTTPRequest.networkIndicator decrementActivityCount];
     }
 }
 
