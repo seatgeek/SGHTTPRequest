@@ -10,4 +10,5 @@
 
 @interface NSString (SGHTTPRequest)
 - (BOOL)containsSubstring:(NSString *)substring;
+- (NSString *)sgHTTPRequestHash;
 @end

@@ -492,7 +492,7 @@ void doOnMain(void(^block)()) {
             return ;
         }
         NSString *shortDataPath = [NSString stringWithFormat:@"Data/%@-%@",
-                                   @(self.url.hash),
+                                   self.url.absoluteString.sgHTTPRequestHash,
                                    fileSafeETag];
         NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, shortDataPath];
         if (![data writeToFile:fullDataPath atomically:YES]) {
@@ -541,7 +541,7 @@ void doOnMain(void(^block)()) {
 }
 
 - (NSString *)pathForCachedIndex {
-    return [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, @(self.url.hash)];
+    return [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, self.url.absoluteString.sgHTTPRequestHash];
 }
 
 + (NSUInteger)totalDataCacheSize {
