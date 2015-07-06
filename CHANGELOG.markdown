@@ -1,3 +1,9 @@
+## 1.2.0
+
+- Added HTTP ETag support and persistent response caching
+- More detailed response and error logging 
+- Added PATCH support
+  
 ## 1.1.1
 
 - Wrap up non-app extension compatible code in an SG_APP_EXTENSIONS macro
