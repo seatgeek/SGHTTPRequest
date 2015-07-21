@@ -416,6 +416,21 @@ void doOnMain(void(^block)()) {
     return _eTag;
 }
 
+- (NSData *)cachedResponseData {
+    if (!self.allowCacheToDisk) {
+        return nil;
+    }
+    return [self cachedDataForETag:self.eTag newExpiryDate:nil];
+}
+
+- (id)cachedResponseJSON {
+    if (!self.allowCacheToDisk) {
+        return nil;
+    }
+    return self.cachedResponseData ? [NSJSONSerialization JSONObjectWithData:self.cachedResponseData
+                                                                     options:0 error:nil] : nil;
+}
+
 - (NSData *)cachedDataForETag:(NSString *)eTag newExpiryDate:(NSDate *)newExpiryDate {
     if (!self.url) {
         return nil;
@@ -447,7 +462,7 @@ void doOnMain(void(^block)()) {
     [NSFileManager.defaultManager setAttributes:@{NSFileModificationDate:NSDate.date}
                        ofItemAtPath:fullDataPath
                          error:nil];
-    return [NSData dataWithContentsOfFile:fullDataPath];
+        return [NSData dataWithContentsOfFile:fullDataPath];
 }
 
 - (void)cacheDataForETag:(NSString *)eTag expiryDate:(NSDate *)expiryDate {

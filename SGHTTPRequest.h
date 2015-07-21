@@ -266,4 +266,14 @@ a new identical request.
  */
 @property (nonatomic, strong) NSString *eTag;
 
+/**
+ * The cached raw response data for the current eTag. nil if no cached data.
+ */
+- (NSData *)cachedResponseData;
+
+/**
+ * The cached response JSON. nil if no cached data.
+ */
+- (id)cachedResponseJSON;
+
 @end
