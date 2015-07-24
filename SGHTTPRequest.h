@@ -248,6 +248,12 @@ a new identical request.
 + (void)setMaxDiskCacheSize:(NSUInteger)megaBytes;
 
 /**
+ * Sets the default max-age of cached http responses for this HTTPRequest.
+ * Defaults to SGHTTPRequest.defaultCacheMaxAge
+ */
+@property (nonatomic, assign) NSTimeInterval timeToExpire;
+
+/**
  * Sets the default max-age of cached http responses.  
  * Defaults to 30 days (2592000 seconds)
  */
