@@ -213,24 +213,26 @@ void doOnMain(void(^block)()) {
         manager.requestSerializer = AFJSONRequestSerializer.serializer;
     }
 
-    if (url.host.length && !gReachabilityManagers[url.host]) {
-        AFNetworkReachabilityManager *reacher = [AFNetworkReachabilityManager managerForDomain:url
-              .host];
-        if (reacher) {
-            gReachabilityManagers[url.host] = reacher;
+    @synchronized(self) {
+        if (url.host.length && !gReachabilityManagers[url.host]) {
+            AFNetworkReachabilityManager *reacher = [AFNetworkReachabilityManager managerForDomain:url
+                  .host];
+            if (reacher) {
+                gReachabilityManagers[url.host] = reacher;
 
-            reacher.reachabilityStatusChangeBlock = ^(AFNetworkReachabilityStatus status) {
-                switch (status) {
-                    case AFNetworkReachabilityStatusReachableViaWWAN:
-                    case AFNetworkReachabilityStatusReachableViaWiFi:
-                        [self.class runRetryQueueFor:url.host];
-                        break;
-                    case AFNetworkReachabilityStatusNotReachable:
-                    default:
-                        break;
-                }
-            };
-            [reacher startMonitoring];
+                reacher.reachabilityStatusChangeBlock = ^(AFNetworkReachabilityStatus status) {
+                    switch (status) {
+                        case AFNetworkReachabilityStatusReachableViaWWAN:
+                        case AFNetworkReachabilityStatusReachableViaWiFi:
+                            [self.class runRetryQueueFor:url.host];
+                            break;
+                        case AFNetworkReachabilityStatusNotReachable:
+                        default:
+                            break;
+                    }
+                };
+                [reacher startMonitoring];
+            }
         }
     }
 
