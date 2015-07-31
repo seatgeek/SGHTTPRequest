@@ -282,4 +282,17 @@ a new identical request.
  */
 - (id)cachedResponseJSON;
 
+/**
+ * Remove any cached response JSON for this request if it exists.
+ */
+- (void)removeCacheFiles;
+
+/**
+ * Remove any cached response JSON for this request if it has expired.
+ * This is automatically called on each new request start.
+ */
+- (void)removeCacheFilesIfExpired;
+
+
+
 @end
