@@ -18,7 +18,8 @@ typedef NS_OPTIONS(NSInteger, SGHTTPRequestMethod) {
     SGHTTPRequestMethodPost,
     SGHTTPRequestMethodDelete,
     SGHTTPRequestMethodPut,
-    SGHTTPRequestMethodPatch
+    SGHTTPRequestMethodPatch,
+    SGHTTPRequestMethodMultipartPost
 };
 
 typedef NS_OPTIONS(NSInteger, SGHTTPDataType) {
@@ -71,6 +72,15 @@ typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
 * Returns a new PATCH request instance for the given URL.
 */
 + (instancetype)patchRequestWithURL:(NSURL *)url;
+
+/**
+ * Returns a new multipart POST request instance for the given URL and parameters
+ */
++ (instancetype)multiPartPostRequestWithURL:(NSURL *)url
+                                       data:(NSData *)data
+                                       name:(NSString *)name
+                                   filename:(NSString *)filename
+                                   mimeType:(NSString *)mimeType;
 
 /**
 * Returns a new POST request instance for the given URL, configured to send the

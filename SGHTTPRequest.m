@@ -29,6 +29,11 @@ SGHTTPLogging gLogging = SGHTTPLogNothing;
 @property (nonatomic, assign) NSInteger statusCode;
 @property (nonatomic, strong) NSError *error;
 @property (nonatomic, assign) BOOL cancelled;
+
+@property (nonatomic, strong) NSData *multiPartData;
+@property (nonatomic, strong) NSString *multiPartName;
+@property (nonatomic, strong) NSString *multiPartFilename;
+@property (nonatomic, strong) NSString *multiPartMimeType;
 @end
 
 void doOnMain(void(^block)()) {
@@ -69,6 +74,19 @@ void doOnMain(void(^block)()) {
 
 + (instancetype)patchRequestWithURL:(NSURL *)url {
     return [[self alloc] initWithURL:url method:SGHTTPRequestMethodPatch];
+}
+
++ (instancetype)multiPartPostRequestWithURL:(NSURL *)url
+                                       data:(NSData *)data
+                                       name:(NSString *)name
+                                   filename:(NSString *)filename
+                                   mimeType:(NSString *)mimeType {
+    SGHTTPRequest *request = [[self alloc] initWithURL:url method:SGHTTPRequestMethodMultipartPost];
+    request.multiPartData = data;
+    request.multiPartName = name;
+    request.multiPartFilename = filename;
+    request.multiPartMimeType = mimeType;
+    return request;
 }
 
 + (instancetype)xmlPostRequestWithURL:(NSURL *)url {
@@ -131,6 +149,19 @@ void doOnMain(void(^block)()) {
         case SGHTTPRequestMethodPost:
             _operation = [manager POST:self.url.absoluteString parameters:self.parameters
                   success:success failure:failure];
+            break;
+        case SGHTTPRequestMethodMultipartPost:
+            {
+            __weak SGHTTPRequest *me = self;
+            _operation = [manager POST:self.url.absoluteString parameters:self.parameters
+             constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                 [formData appendPartWithFileData:me.multiPartData
+                                             name:me.multiPartName
+                                         fileName:me.multiPartFilename
+                                         mimeType:me.multiPartMimeType];
+                  }
+                  success:success failure:failure];
+             }
             break;
         case SGHTTPRequestMethodDelete:
             _operation = [manager DELETE:self.url.absoluteString parameters:self.parameters
