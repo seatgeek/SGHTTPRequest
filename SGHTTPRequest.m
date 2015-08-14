@@ -599,7 +599,16 @@ void doOnMain(void(^block)()) {
 }
 
 - (NSString *)pathForCachedIndex {
-    return [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, self.url.absoluteString.sgHTTPRequestHash];
+    NSMutableString *filename = self.url.absoluteString.mutableCopy;
+    if (self.requestHeaders.count) {
+        for (id key in self.requestHeaders) {
+            if ([key isKindOfClass:NSString.class] && [key isEqualToString:@"If-None-Match"]) {
+                continue;
+            }
+            [filename appendFormat:@":%@:%@", key, self.requestHeaders[key]];
+        }
+    }
+    return [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, filename.sgHTTPRequestHash];
 }
 
 + (NSUInteger)totalDataCacheSize {
