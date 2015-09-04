@@ -128,6 +128,18 @@ void doOnMain(void(^block)()) {
 
     if (self.eTag.length) {
         [manager.requestSerializer setValue:self.eTag forHTTPHeaderField:@"If-None-Match"];
+
+        // The iOS URL loading system by default does local caching. If it receives a 304 back,
+        // it brings in the most previously cached body for that URL, updates our status code to 200,
+        // but seems to keep the other headers from the 304. Unfortunately this means that we get our
+        // current eTag back in the headers with the most recent 200 response body, if that previous
+        // response lacked an eTag and was not related. So we need to turn off the iOS URL loading system
+        // local caching when we are doing our own eTag caching. That way our eTag caching code in -success:
+        // can get our 304 responses back undoctored. Local caching will be taken care of by our code.
+        manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+    } else {
+        [manager.requestSerializer setValue:nil forHTTPHeaderField:@"If-None-Match"];
+        manager.requestSerializer.cachePolicy = NSURLRequestUseProtocolCachePolicy;
     }
 
     id success = ^(AFHTTPRequestOperation *operation, id responseObject) {
