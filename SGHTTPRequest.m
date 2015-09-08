@@ -355,7 +355,8 @@ void doOnMain(void(^block)()) {
             // (We've experienced this with gzipped payloads stripping ETag information.)
             // In this case, *if* we received a 200 response and received no ETag, we should
             // overwrite the cached copy with the fresh data.
-            [self cacheDataForETag:@"Missing" expiryDate:expiryDate];
+            self.eTag = @"Missing";
+            [self cacheDataForETag:self.eTag expiryDate:expiryDate];
         }
         if (!self.allowCacheToDisk) {
             [self removeCacheFiles];
