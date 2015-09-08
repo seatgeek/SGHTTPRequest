@@ -126,7 +126,7 @@ void doOnMain(void(^block)()) {
 
     [self removeCacheFilesIfExpired];
 
-    if (self.eTag.length) {
+    if (self.eTag.length && ![self.eTag isEqualToString:@"Missing"]) {
         [manager.requestSerializer setValue:self.eTag forHTTPHeaderField:@"If-None-Match"];
 
         // The iOS URL loading system by default does local caching. If it receives a 304 back,
@@ -355,7 +355,7 @@ void doOnMain(void(^block)()) {
             // (We've experienced this with gzipped payloads stripping ETag information.)
             // In this case, *if* we received a 200 response and received no ETag, we should
             // overwrite the cached copy with the fresh data.
-            [self cacheDataForETag:self.eTag expiryDate:expiryDate];
+            [self cacheDataForETag:@"Missing" expiryDate:expiryDate];
         }
         if (!self.allowCacheToDisk) {
             [self removeCacheFiles];
