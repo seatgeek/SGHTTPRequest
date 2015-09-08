@@ -350,6 +350,12 @@ void doOnMain(void(^block)()) {
                 // response has changed.  Let's cache the new version.
                 [self cacheDataForETag:eTag expiryDate:expiryDate];
             }
+        } else if (self.eTag.length && self.statusCode == 200) {
+            // Sometimes servers can ommit an ETag, even if the contents have changed.
+            // (We've experienced this with gzipped payloads stripping ETag information.)
+            // In this case, *if* we received a 200 response and received no ETag, we should
+            // overwrite the cached copy with the fresh data.
+            [self cacheDataForETag:self.eTag expiryDate:expiryDate];
         }
         if (!self.allowCacheToDisk) {
             [self removeCacheFiles];
