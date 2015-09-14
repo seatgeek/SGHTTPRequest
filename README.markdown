@@ -96,6 +96,49 @@ The easiest way to implement this is to contain your request code in a method, a
 }
 ```
 
+### Response caching
+
+If your server uses ETag headers then you can cache the responses locally and avoid costly network traffic when the payload hasn't changed since the previous request.  Add the following code to your AppDelegate `didFinishLaunchingWithOptions` method:
+
+```objc
+// allow responses cached by ETag to persist between app sessions
+[SGHTTPRequest setAllowCacheToDisk:YES]; 
+// maximum size of the local response cache in MB
+[SGHTTPRequest setMaxDiskCacheSize:30];  
+```
+
+If an HTTP response has been cached to disk, you can also access the cached copy to allow for viewing data offline or instantaneously while you fetch a fresh response:
+
+```objc
+NSURL *url = [NSURL URLWithString:@"http://example.com/things"];
+
+// create a GET request
+SGHTTPRequest *req = [SGHTTPRequest requestWithURL:url];
+
+__weak typeof(self) me = self;
+
+// option retry handler
+req.onNetworkReachable = ^{
+    [me requestThings];
+};
+
+NSDictionary *responseDict = req.cachedResponseJSON;
+
+if (responseDict[@"my_data_key"]) {
+    // If available you can update your UI
+    // immediately with the cached data
+}
+
+// optional success handler
+req.onSuccess = ^(SGHTTPRequest *_req) {
+    // You might want to update your UI with
+    // the fresh response data here
+};
+
+// start the request in the background
+[req start];
+```
+
 ### Other Options
 
 See `SGHTTPRequest.h` for more.
