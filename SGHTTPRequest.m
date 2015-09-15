@@ -214,6 +214,7 @@ void doOnMain(void(^block)()) {
     self.showActivityIndicator = YES;
     self.allowCacheToDisk = SGHTTPRequest.allowCacheToDisk;
     self.timeToExpire = SGHTTPRequest.defaultCacheMaxAge;
+    self.allowNSNull = SGHTTPRequest.allowNSNull;
     self.method = method;
     self.url = url;
 
@@ -223,7 +224,7 @@ void doOnMain(void(^block)()) {
     } else {
         self.responseFormat = SGHTTPDataTypeHTTP;
     }
-    self.logging = gLogging;
+    self.logging = SGHTTPRequest.logging;
 
     return self;
 }
@@ -403,9 +404,7 @@ void doOnMain(void(^block)()) {
 #pragma mark - Getters
 
 - (id)responseJSON {
-    return self.responseData
-          ? [NSJSONSerialization JSONObjectWithData:self.responseData options:0 error:nil]
-          : nil;
+    return [SGJSONSerialization JSONObjectWithData:self.responseData allowNSNull:self.allowNSNull logURL:self.url.absoluteString];
 }
 
 + (NSMutableArray *)retryQueueFor:(NSString *)baseURL {
@@ -479,8 +478,7 @@ void doOnMain(void(^block)()) {
     if (!self.allowCacheToDisk) {
         return nil;
     }
-    return self.cachedResponseData ? [NSJSONSerialization JSONObjectWithData:self.cachedResponseData
-                                                                     options:0 error:nil] : nil;
+    return [SGJSONSerialization JSONObjectWithData:self.cachedResponseData allowNSNull:self.allowNSNull logURL:self.url.absoluteString];
 }
 
 - (NSData *)cachedDataForETag:(NSString *)eTag {
@@ -834,6 +832,18 @@ static NSUInteger gDefaultCacheMaxAge = 2592000;
     [self clearExpiredFiles];
 }
 
+#pragma mark - NSNull Handling
+
+static BOOL gAllowNSNulls = YES;
+
++ (void)setAllowNSNull:(BOOL)allow {
+    gAllowNSNulls = allow;
+}
+
++ (BOOL)allowNSNull {
+    return gAllowNSNulls;
+}
+
 #pragma mark - Logging
 
 + (void)setLogging:(SGHTTPLogging)logging {
@@ -841,6 +851,10 @@ static NSUInteger gDefaultCacheMaxAge = 2592000;
     // Logging in debug builds only.
     gLogging = logging;
 #endif
+}
+
++ (SGHTTPLogging)logging {
+    return gLogging;
 }
 
 - (NSString *)boxUpString:(NSString *)string fatLine:(BOOL)fatLine {

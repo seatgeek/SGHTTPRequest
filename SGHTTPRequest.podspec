@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.author        = "SeatGeek"
   s.platform      = :ios, "7.0"
   s.source        = { :git => "https://github.com/seatgeek/SGHTTPRequest.git", :tag => "1.3.0" }
-  s.source_files  = "*.{h,m}"
+  s.source_files = '**/*.{h,m}'
   s.requires_arc  = true
   s.dependency    "AFNetworking", '~>2.0'
 end

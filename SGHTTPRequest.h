@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <SGHTTPRequest/SGJSONSerialization.h>
 
 @class SGHTTPRequest;
 
@@ -33,7 +34,8 @@ typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
     SGHTTPLogRequests   = 1 << 0,
     SGHTTPLogResponses  = 1 << 1,
     SGHTTPLogErrors     = 1 << 2,
-    SGHTTPLogAll        = (SGHTTPLogRequests|SGHTTPLogResponses|SGHTTPLogErrors)
+    SGHTTPLogNullCleanses  = 1 << 3,
+    SGHTTPLogAll        = (SGHTTPLogRequests|SGHTTPLogResponses|SGHTTPLogErrors|SGHTTPLogNullCleanses)
 };
 
 @interface SGHTTPRequest : NSObject
@@ -213,19 +215,48 @@ a new identical request.
 @property (nonatomic, assign) SGHTTPDataType responseFormat;
 
 /**
+ * Extracts the base URL from a given URL
+ */
++ (NSString *)baseURLFrom:(NSURL *)url;
+
+#pragma mark Null handling
+/** @name Null handling */
+
+/**
+ * Global option to allow NSNull objects in json response dictionaries.
+ * Default is YES.
+ */
++ (void)setAllowNSNull:(BOOL)allow;
+
+/**
+ * Returns the global option to allow NSNull objects in json response dictionaries.
+ * Default is YES
+ */
++ (BOOL)allowNSNull;
+
+/**
+ * Whether to allow NSNull objects in json response dictionaries for this SGHTTPRequest object.
+ * Defaults to SGHTTPRequest.allowNSNull
+ */
+@property (nonatomic, assign) BOOL allowNSNull;
+
+#pragma mark Logging
+/** @name Logging */
+
+/**
 * Optional per-request logging (defaults to global SGHTTPRequest logging setting)
 */
 @property (nonatomic, assign) SGHTTPLogging logging;
 
 /**
-* SGHTTP Request Logging (defaults to SGHTTPLogNothing.)  Logging is available for DEBUG builds only.
-*/
+ * SGHTTP Request Logging (defaults to SGHTTPLogNothing.)  Logging is available for DEBUG builds only.
+ */
 + (void)setLogging:(SGHTTPLogging)logging;
 
 /**
-* Extracts the base URL from a given URL
-*/
-+ (NSString *)baseURLFrom:(NSURL *)url;
+ * SGHTTP Request Logging (defaults to SGHTTPLogNothing.)
+ */
++ (SGHTTPLogging)logging;
 
 #pragma mark ETag Caching
 /** @name ETag Caching */
