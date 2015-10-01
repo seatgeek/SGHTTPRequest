@@ -16,6 +16,7 @@
 #define SGETag              @"eTag"
 #define SGResponseDataPath  @"dataPath"
 #define SGExpiryDate        @"expires"
+#define SGDontPurge         @"dontPurge"
 
 NSMutableDictionary *gReachabilityManagers;
 SGActivityIndicator *gNetworkIndicator;
@@ -566,9 +567,17 @@ void doOnMain(void(^block)()) {
         if (!fileSafeETag.length) {
             return ;
         }
-        NSString *shortDataPath = [NSString stringWithFormat:@"Data/%@-%@",
-                                   self.url.absoluteString.sgHTTPRequestHash,
-                                   fileSafeETag];
+        NSString *shortDataPath;
+        if (self.preventPurging) {
+            shortDataPath = [NSString stringWithFormat:@"Data/%@-%@-%@",
+                                       SGDontPurge,
+                                       self.url.absoluteString.sgHTTPRequestHash,
+                                       fileSafeETag];
+        } else {
+            shortDataPath = [NSString stringWithFormat:@"Data/%@-%@",
+                                       self.url.absoluteString.sgHTTPRequestHash,
+                                       fileSafeETag];
+        }
         NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, shortDataPath];
         if (![data writeToFile:fullDataPath atomically:YES]) {
             return;
@@ -654,6 +663,9 @@ void doOnMain(void(^block)()) {
                                                                                    error:nil];
     NSInteger existingCacheSize = 0;
     for (NSURL *fileURL in dataFilesArray) {
+        if ([fileURL.absoluteString.lastPathComponent containsSubstring:SGDontPurge]) {
+            continue;
+        }
         NSNumber *fileSize;
         [fileURL getResourceValue:&fileSize forKey:NSURLFileSizeKey error:nil];
         existingCacheSize += fileSize.longLongValue;
@@ -682,6 +694,10 @@ void doOnMain(void(^block)()) {
         if (bytesToDelete <= 0) {
             break;
         }
+        if ([fileURL.absoluteString.lastPathComponent containsSubstring:SGDontPurge]) {
+            continue;
+        }
+
         NSError *error;
 
         NSNumber *fileSize;

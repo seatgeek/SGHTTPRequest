@@ -300,6 +300,13 @@ a new identical request.
  */
 + (void)setDefaultCacheMaxAge:(NSTimeInterval)timeToExpire;
 
+
+/**
+ * Prevents cached data for this request being purged if
+ * the cache becomes full
+ */
+@property (nonatomic, assign) BOOL preventPurging;
+
 /**
  * Clears the Etag disk cache completely.
  */
