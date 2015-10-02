@@ -463,7 +463,17 @@ void doOnMain(void(^block)()) {
     if (_allowCacheToDisk && !_eTag) {
         NSString *indexPath = self.pathForCachedIndex;
         NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexPath];
-        _eTag = index[SGETag];
+        if (index) {
+            // sanity check that the data file exists.
+            NSString *fullDataPath = [SGHTTPRequest fullDataPathFromIndex:index];
+            if ([NSFileManager.defaultManager fileExistsAtPath:fullDataPath]) {
+                _eTag = index[SGETag];
+            } else {
+    #ifdef DEBUG
+                NSLog(@"SGHTTPRequest could not find cached data for Etag: %@", index[SGETag]);
+    #endif
+            }
+        }
     }
     return _eTag;
 }
@@ -479,7 +489,11 @@ void doOnMain(void(^block)()) {
     if (!self.allowCacheToDisk) {
         return nil;
     }
-    return [SGJSONSerialization JSONObjectWithData:self.cachedResponseData allowNSNull:self.allowNSNull logURL:self.url.absoluteString];
+    NSData *cachedData = self.cachedResponseData;
+    if (!cachedData) {
+        return nil;
+    }
+    return [SGJSONSerialization JSONObjectWithData:cachedData allowNSNull:self.allowNSNull logURL:self.url.absoluteString];
 }
 
 - (NSData *)cachedDataForETag:(NSString *)eTag {
@@ -514,7 +528,7 @@ void doOnMain(void(^block)()) {
         }
     }
 
-    NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[SGResponseDataPath]];
+    NSString *fullDataPath = [SGHTTPRequest fullDataPathFromIndex:index];
     if (![NSFileManager.defaultManager fileExistsAtPath:fullDataPath]) {
       return nil;
     }
@@ -549,7 +563,7 @@ void doOnMain(void(^block)()) {
 
     NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexPath];
     if (index[SGResponseDataPath]) {
-        fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[SGResponseDataPath]];
+        fullDataPath = [SGHTTPRequest fullDataPathFromIndex:index];
     }
     // delete the index file before the data file.  Noone should reference the data file without the index file.
     if ([NSFileManager.defaultManager fileExistsAtPath:indexPath]) {
@@ -592,15 +606,24 @@ void doOnMain(void(^block)()) {
     });
 }
 
++ (NSString *)fullDataPathFromIndex:(NSDictionary *)index {
+    if (!index) {
+        return nil;
+    }
+    NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[SGResponseDataPath]];
+    return fullDataPath;
+}
+
 + (void)removeCacheFilesForIndexPath:(NSString *)indexPath index:(NSDictionary *)index {
+    // delete the index file before the data to maintain data link integrity
+    if ([NSFileManager.defaultManager fileExistsAtPath:indexPath]) {
+        [NSFileManager.defaultManager removeItemAtPath:indexPath error:nil];
+    }
     if (index[SGResponseDataPath]) {
-        NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[SGResponseDataPath]];
+        NSString *fullDataPath = [self fullDataPathFromIndex:index];
         if ([NSFileManager.defaultManager fileExistsAtPath:fullDataPath]) {
             [NSFileManager.defaultManager removeItemAtPath:fullDataPath error:nil];
         }
-    }
-    if ([NSFileManager.defaultManager fileExistsAtPath:indexPath]) {
-        [NSFileManager.defaultManager removeItemAtPath:indexPath error:nil];
     }
 }
 
@@ -614,7 +637,7 @@ void doOnMain(void(^block)()) {
 
     BOOL dataFileMissing = NO;
     if (index[SGResponseDataPath]) {
-        NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[SGResponseDataPath]];
+        NSString *fullDataPath = [self fullDataPathFromIndex:index];
         if (![NSFileManager.defaultManager fileExistsAtPath:fullDataPath]) {
             dataFileMissing = YES;
         }
@@ -741,7 +764,7 @@ void doOnMain(void(^block)()) {
         for (NSURL *indexFileURL in searchIndexFiles) {
             NSDictionary *index = [NSDictionary dictionaryWithContentsOfURL:indexFileURL];
             if (index[SGResponseDataPath]) {
-                NSString *fullDataPath = [NSString stringWithFormat:@"%@/%@", SGHTTPRequest.cacheFolder, index[SGResponseDataPath]];
+                NSString *fullDataPath = [self fullDataPathFromIndex:index];
                 NSURL *fullDataURL = [NSURL fileURLWithPath:fullDataPath];
                 if ([fullDataURL isEqual:dataFileURL.URLByResolvingSymlinksInPath]) {
                     indexPathToDelete = indexFileURL;
