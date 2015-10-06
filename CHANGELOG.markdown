@@ -1,3 +1,12 @@
+## 1.4.1
+
+- Optimized ETag cache flushing
+- Added a way to flag cached requests to not be purged when the cache is getting full
+
+## 1.4.0
+
+- Added the option to disallow NSNull objects in JSON responses
+
 ## 1.3.0
 
 - Added support for multipart post requests
@@ -20,7 +29,7 @@
 
 ## 1.1.0
 
-- Fancy debug error output formatting for readability. Print out request and 
+- Fancy debug error output formatting for readability. Print out request and
   response JSON in pretty format when displaying errors
 - Added `responseJSON` helper getter for JSON responses
 - Added `requestHeaders` property
