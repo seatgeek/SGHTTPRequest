@@ -190,6 +190,18 @@ void doOnMain(void(^block)()) {
             break;
     }
 
+    __weak typeof(self) me = self;
+    if (self.onUploadProgress) {
+        [_operation setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite) {
+            me.onUploadProgress(totalBytesWritten, totalBytesExpectedToWrite);
+        }];
+    }
+    if (self.onDownloadProgress) {
+        [_operation setDownloadProgressBlock:^(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead) {
+            me.onDownloadProgress(totalBytesRead, totalBytesExpectedToRead);
+        }];
+    }
+
     if (self.showActivityIndicator) {
         [SGHTTPRequest.networkIndicator incrementActivityCount];
     }

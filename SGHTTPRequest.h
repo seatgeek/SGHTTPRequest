@@ -13,6 +13,7 @@
 
 typedef void (^SGHTTPResponseBlock)(SGHTTPRequest *req);
 typedef void (^SGHTTPRetryBlock)();
+typedef void (^SGHTTPProgressBlock)(long long bytesSoFar, long long totalBytesExpected);
 
 typedef NS_OPTIONS(NSInteger, SGHTTPRequestMethod) {
     SGHTTPRequestMethodGet,
@@ -118,6 +119,17 @@ typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
 * <responseString>, <statusCode>, and <error> values in this block.
 */
 @property (nonatomic, copy) SGHTTPResponseBlock onFailure;
+
+/**
+ * Called as request upload progresses. Client code that needs to update a progress
+ * view etc can use this.
+ */
+@property (nonatomic, copy) SGHTTPProgressBlock onUploadProgress;
+
+/**
+ * Called as reponse download progresses.
+ */
+@property (nonatomic, copy) SGHTTPProgressBlock onDownloadProgress;
 
 /**
 Called when a failed request's network resource becomes available again. This
