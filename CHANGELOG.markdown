@@ -1,3 +1,8 @@
+## 1.5.0
+
+- Added upload and download progress blocks for easy upload and download handling
+- Improved disk cache performance
+
 ## 1.4.1
 
 - Optimized ETag cache flushing
