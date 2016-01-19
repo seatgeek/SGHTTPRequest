@@ -1050,8 +1050,8 @@ static BOOL gAllowNSNulls = YES;
     return self.logging & SGHTTPLogResponses;
 }
 
-- (BOOL)logCache {
-    return self.logging & SGHTTPLogCache;
++ (BOOL)logCache {
+    return SGHTTPRequest.logging & SGHTTPLogCache;
 }
 
 @end
