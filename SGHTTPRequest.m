@@ -801,11 +801,11 @@ void doOnMain(void(^block)()) {
         return;
     }
 
-#ifdef DEBUG
-    if (bytesDeleted) {
-        NSLog(@"Flushing %.1fMB from SGHTTPRequest ETag cache", (CGFloat)bytesDeleted / 1024.0 / 1024.0);
+    if (SGHTTPRequest.logCache) {
+        if (bytesDeleted) {
+            NSLog(@"Flushing %.1fMB from SGHTTPRequest ETag cache", (CGFloat)bytesDeleted / 1024.0 / 1024.0);
+        }
     }
-#endif
 
 
     NSMutableArray *searchIndexFiles = nil;
@@ -1048,6 +1048,10 @@ static BOOL gAllowNSNulls = YES;
 
 - (BOOL)logResponses {
     return self.logging & SGHTTPLogResponses;
+}
+
+- (BOOL)logCache {
+    return self.logging & SGHTTPLogCache;
 }
 
 @end

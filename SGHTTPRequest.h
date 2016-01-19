@@ -36,7 +36,8 @@ typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
     SGHTTPLogResponses  = 1 << 1,
     SGHTTPLogErrors     = 1 << 2,
     SGHTTPLogNullCleanses  = 1 << 3,
-    SGHTTPLogAll        = (SGHTTPLogRequests|SGHTTPLogResponses|SGHTTPLogErrors|SGHTTPLogNullCleanses)
+    SGHTTPLogCache      = 1 << 4,
+    SGHTTPLogAll        = (SGHTTPLogRequests|SGHTTPLogResponses|SGHTTPLogErrors|SGHTTPLogNullCleanses|SGHTTPLogCache)
 };
 
 @interface SGHTTPRequest : NSObject
