@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <SGHTTPRequest/SGJSONSerialization.h>
+#import <SGHTTPRequest/SGFileCache.h>
 
 @class SGHTTPRequest;
 
@@ -312,13 +313,6 @@ a new identical request.
  * Defaults to 30 days (2592000 seconds)
  */
 + (void)setDefaultCacheMaxAge:(NSTimeInterval)timeToExpire;
-
-
-/**
- * Prevents cached data for this request being purged if
- * the cache becomes full
- */
-@property (nonatomic, assign) BOOL preventPurging;
 
 /**
  * Clears the Etag disk cache completely.
