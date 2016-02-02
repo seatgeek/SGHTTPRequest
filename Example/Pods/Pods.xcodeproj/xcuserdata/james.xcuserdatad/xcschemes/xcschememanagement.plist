@@ -9,7 +9,7 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-SGHTTPRequest_Tests.xcscheme</key>
+		<key>Pods-SGHTTPRequestTests.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -27,12 +27,12 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>821D975157EEE5026EACDB2B16C2DD21</key>
+		<key>A949846FF81846B68D48C10BC965F017</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>BEB0DA707A86023131AD6A93B9F3A1B9</key>
+		<key>C0AC6A9206F00B89B7F0A097D43698C1</key>
 		<dict>
 			<key>primary</key>
 			<true/>
