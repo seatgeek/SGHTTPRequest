@@ -1,0 +1,6 @@
+framework module Pods_SGHTTPRequest_Tests {
+  umbrella header "Pods-SGHTTPRequest_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}

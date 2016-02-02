@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "404BE93BAC097EDFB28F2626D05FE6BA1FBE7272",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "1390E8181C45218C43CE1600D5979FDCD4A20106" : 0,
+    "404BE93BAC097EDFB28F2626D05FE6BA1FBE7272" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "F1E27019-EF48-434C-88CA-2FC1432A68EA",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "1390E8181C45218C43CE1600D5979FDCD4A20106" : "..",
+    "404BE93BAC097EDFB28F2626D05FE6BA1FBE7272" : "SGHTTPRequest\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "SGHTTPRequest",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Example\/SGHTTPRequest.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/seatgeek\/iphone-app.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "1390E8181C45218C43CE1600D5979FDCD4A20106"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/seatgeek\/SGHTTPRequest.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "404BE93BAC097EDFB28F2626D05FE6BA1FBE7272"
+    }
+  ]
+}
