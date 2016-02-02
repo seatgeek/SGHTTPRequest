@@ -35,8 +35,6 @@
 }
 
 + (instancetype)cacheFor:(NSString *)cacheName {
-    SGHTTPAssert(NSThread.isMainThread, @"SGFile cache operations must be called from the main thread");
-
     cacheName = cacheName ?: @"DefaultCache";
 
     static NSMutableDictionary *caches;
@@ -45,23 +43,25 @@
         caches = NSMutableDictionary.new;
     });
 
-    SGFileCache *cache = caches[cacheName];
-    if (!cache) {
-        cache = SGFileCache.new;
+    @synchronized(cacheName) {
+        SGFileCache *cache = caches[cacheName];
+        if (!cache) {
+            cache = SGFileCache.new;
 
-        NSString *cacheFolder = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0];
-        cacheFolder = [cacheFolder stringByAppendingFormat:@"/SGFileCache/%@", cacheName];
-        BOOL isDir;
-        NSString *dataFolder = [cacheFolder stringByAppendingString:@"/Data"];
-        if (![NSFileManager.defaultManager fileExistsAtPath:dataFolder isDirectory:&isDir]) {
-            [NSFileManager.defaultManager createDirectoryAtPath:dataFolder withIntermediateDirectories:YES
-                                                     attributes:nil error:nil];
+            NSString *cacheFolder = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0];
+            cacheFolder = [cacheFolder stringByAppendingFormat:@"/SGFileCache/%@", cacheName];
+            BOOL isDir;
+            NSString *dataFolder = [cacheFolder stringByAppendingString:@"/Data"];
+            if (![NSFileManager.defaultManager fileExistsAtPath:dataFolder isDirectory:&isDir]) {
+                [NSFileManager.defaultManager createDirectoryAtPath:dataFolder withIntermediateDirectories:YES
+                                                         attributes:nil error:nil];
+            }
+            cache.cacheFolder = cacheFolder;
+            cache.dataFolder = dataFolder;
+            caches[cacheName] = cache;
         }
-        cache.cacheFolder = cacheFolder;
-        cache.dataFolder = dataFolder;
-        caches[cacheName] = cache;
+        return cache;
     }
-    return caches[cacheName];
 }
 
 #pragma mark Cache Size
@@ -118,6 +118,21 @@
 
 - (NSData *)cachedDataFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys newExpiryDate:(NSDate *)newExpiryDate {
     return [self cachedDataFor:primaryKey secondaryKeys:secondaryKeys newExpiryDate:newExpiryDate updateExpiry:YES];
+}
+
+- (void)getCachedDataAsyncFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys
+                newExpiryDate:(NSDate *)newExpiryDate dataCompletion:(void (^)(NSData *))dataCompletion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // todo: use a readers-writer lock on this
+        NSData *cachedData = [self cachedDataFor:primaryKey
+                                   secondaryKeys:secondaryKeys
+                                   newExpiryDate:newExpiryDate];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (dataCompletion) {
+                dataCompletion(cachedData);
+            }
+        });
+    });
 }
 
 - (NSData *)cachedDataFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys newExpiryDate:(NSDate *)newExpiryDate updateExpiry:(BOOL)updateExpiry {

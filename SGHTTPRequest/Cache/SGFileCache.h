@@ -72,7 +72,13 @@
 - (NSData *)cachedDataFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys newExpiryDate:(NSDate *)newExpiryDate;
 
 /**
- * The cache the raw data for the given primary and secondary keys, and update the expiry date
+ * Get the cached raw data asyncronously for the given primary and secondary keys, and update the expiry date
+ */
+- (void)getCachedDataAsyncFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys
+                newExpiryDate:(NSDate *)newExpiryDate dataCompletion:(void (^)(NSData *))dataCompletion;
+
+/**
+ * Cache the raw data for the given primary and secondary keys, and update the expiry date
  */
 - (void)cacheData:(NSData *)data for:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys expiryDate:(NSDate *)expiryDate;
 

@@ -338,25 +338,20 @@ void doOnMain(void(^block)()) {
         if (eTag.length) {
             if (self.statusCode == 304) {
                 if (!self.responseData.length && self.allowCacheToDisk) {
-                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                        // If we got a 304 and no respose from iOS level caching, check the disk.
-                        NSData *cachedData = [SGHTTPRequest.cache cachedDataFor:self.primaryCacheKey
-                                                                  secondaryKeys:@{SGETag:eTag}
-                                                                  newExpiryDate:expiryDate];
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (cachedData) {
-                                self.responseData = cachedData;
-                                self.eTag = eTag;
-                                if (self.onSuccess) {
-                                    self.onSuccess(self);
-                                }
-                            } else {
-                                self.eTag = nil;
-                                [self removeCacheFiles];
-                                [self start];   //cached data is missing. try again without eTag
-                            }
-                        });
-                    });
+                    [SGHTTPRequest.cache getCachedDataAsyncFor:self.primaryCacheKey
+                            secondaryKeys:@{SGETag:eTag}
+                            newExpiryDate:expiryDate dataCompletion:^(NSData *cachedData) {
+                             if (cachedData) {
+                                 self.responseData = cachedData;
+                                 self.eTag = eTag;
+                                 if (self.onSuccess) {
+                                     self.onSuccess(self);
+                                 }
+                             } else {
+                                 self.eTag = nil;
+                                 [self removeCacheFiles];
+                                 [self start];   //cached data is missing. try again without eTag
+                             }}];
                     return;
                 }
             } else if (self.allowCacheToDisk) {

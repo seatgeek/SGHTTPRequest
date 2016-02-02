@@ -19,7 +19,7 @@
     static BOOL isTest;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        isTest = NSProcessInfo.processInfo.environment[@"SG_IS_TESTING"];   // declared in the test environment var
+        isTest = [NSProcessInfo.processInfo.environment[@"SG_IS_TESTING"] boolValue];   // declared in the test environment var
     });
     return isTest;
 }
