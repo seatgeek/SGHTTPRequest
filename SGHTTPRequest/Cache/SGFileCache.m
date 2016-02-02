@@ -59,6 +59,7 @@
         }
         cache.cacheFolder = cacheFolder;
         cache.dataFolder = dataFolder;
+        caches[cacheName] = cache;
     }
     return caches[cacheName];
 }
