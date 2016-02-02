@@ -2,9 +2,6 @@
 
 #ifdef __OBJC__
 
-  @import Specta;
-  @import Expecta;
-
 #define SG_IS_TESTING
 
 #endif

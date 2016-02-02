@@ -12,7 +12,7 @@
 		6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
 		6003F5BA195388D20070C39A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6003F5B8195388D20070C39A /* InfoPlist.strings */; };
 		6003F5BC195388D20070C39A /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5BB195388D20070C39A /* Tests.m */; };
-		70985FEE981285F9A2FB459D /* Pods_SGHTTPRequest_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A83820A7930D13C654A3320 /* Pods_SGHTTPRequest_Tests.framework */; };
+		74A85CC1C65D70162C84123C /* libPods-SGHTTPRequest_Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E2D24AAB908A14FD0714871B /* libPods-SGHTTPRequest_Tests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,14 +22,14 @@
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6003F58F195388D20070C39A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		6003F591195388D20070C39A /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		6003F5AE195388D20070C39A /* SGHTTPRequest_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SGHTTPRequest_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6003F5AE195388D20070C39A /* SGHTTPRequestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SGHTTPRequestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F5AF195388D20070C39A /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		6003F5B7195388D20070C39A /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		6003F5B9195388D20070C39A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6003F5BB195388D20070C39A /* Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Tests.m; sourceTree = "<group>"; };
 		606FC2411953D9B200FFA9A0 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
-		8A83820A7930D13C654A3320 /* Pods_SGHTTPRequest_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SGHTTPRequest_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B328F4327CE375BD3733167C /* Pods-SGHTTPRequest_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SGHTTPRequest_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SGHTTPRequest_Tests/Pods-SGHTTPRequest_Tests.release.xcconfig"; sourceTree = "<group>"; };
+		E2D24AAB908A14FD0714871B /* libPods-SGHTTPRequest_Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SGHTTPRequest_Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E96506CE40E8E5C596AFDE39 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -41,7 +41,7 @@
 				6003F5B0195388D20070C39A /* XCTest.framework in Frameworks */,
 				6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */,
-				70985FEE981285F9A2FB459D /* Pods_SGHTTPRequest_Tests.framework in Frameworks */,
+				74A85CC1C65D70162C84123C /* libPods-SGHTTPRequest_Tests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +62,7 @@
 		6003F58B195388D20070C39A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6003F5AE195388D20070C39A /* SGHTTPRequest_Tests.xctest */,
+				6003F5AE195388D20070C39A /* SGHTTPRequestTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -74,7 +74,7 @@
 				6003F58F195388D20070C39A /* CoreGraphics.framework */,
 				6003F591195388D20070C39A /* UIKit.framework */,
 				6003F5AF195388D20070C39A /* XCTest.framework */,
-				8A83820A7930D13C654A3320 /* Pods_SGHTTPRequest_Tests.framework */,
+				E2D24AAB908A14FD0714871B /* libPods-SGHTTPRequest_Tests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -120,9 +120,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6003F5AD195388D20070C39A /* SGHTTPRequest_Tests */ = {
+		6003F5AD195388D20070C39A /* SGHTTPRequestTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6003F5C2195388D20070C39A /* Build configuration list for PBXNativeTarget "SGHTTPRequest_Tests" */;
+			buildConfigurationList = 6003F5C2195388D20070C39A /* Build configuration list for PBXNativeTarget "SGHTTPRequestTests" */;
 			buildPhases = (
 				F8B5C81DBF1BD88A0B8777EB /* Check Pods Manifest.lock */,
 				6003F5AA195388D20070C39A /* Sources */,
@@ -135,9 +135,9 @@
 			);
 			dependencies = (
 			);
-			name = SGHTTPRequest_Tests;
+			name = SGHTTPRequestTests;
 			productName = SGHTTPRequestTests;
-			productReference = 6003F5AE195388D20070C39A /* SGHTTPRequest_Tests.xctest */;
+			productReference = 6003F5AE195388D20070C39A /* SGHTTPRequestTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -149,11 +149,6 @@
 				CLASSPREFIX = SG;
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "James Van-As";
-				TargetAttributes = {
-					6003F5AD195388D20070C39A = {
-						TestTargetID = 6003F589195388D20070C39A;
-					};
-				};
 			};
 			buildConfigurationList = 6003F585195388D10070C39A /* Build configuration list for PBXProject "SGHTTPRequest" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -168,7 +163,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6003F5AD195388D20070C39A /* SGHTTPRequest_Tests */,
+				6003F5AD195388D20070C39A /* SGHTTPRequestTests */,
 			);
 		};
 /* End PBXProject section */
@@ -346,7 +341,6 @@
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SGHTTPRequest_Example.app/SGHTTPRequest_Example";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
@@ -365,7 +359,6 @@
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SGHTTPRequest_Example.app/SGHTTPRequest_Example";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
@@ -382,7 +375,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6003F5C2195388D20070C39A /* Build configuration list for PBXNativeTarget "SGHTTPRequest_Tests" */ = {
+		6003F5C2195388D20070C39A /* Build configuration list for PBXNativeTarget "SGHTTPRequestTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6003F5C3195388D20070C39A /* Debug */,
