@@ -12,7 +12,6 @@
 		6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
 		6003F5BA195388D20070C39A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6003F5B8195388D20070C39A /* InfoPlist.strings */; };
 		6003F5BC195388D20070C39A /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5BB195388D20070C39A /* Tests.m */; };
-		74A85CC1C65D70162C84123C /* libPods-SGHTTPRequest_Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E2D24AAB908A14FD0714871B /* libPods-SGHTTPRequest_Tests.a */; };
 		9D3805CAC74CCCEC9741DE5D /* libPods-SGHTTPRequestTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BC82E6A67E1248BCD7110E2F /* libPods-SGHTTPRequestTests.a */; };
 /* End PBXBuildFile section */
 
@@ -21,7 +20,6 @@
 		1E7CB0A476890EFC2DD2EE9B /* Pods-SGHTTPRequestTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SGHTTPRequestTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SGHTTPRequestTests/Pods-SGHTTPRequestTests.release.xcconfig"; sourceTree = "<group>"; };
 		27714EB5F27D00B2DC12D9B5 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		4BF5E1E218E606B6A813EB59 /* SGHTTPRequest.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = SGHTTPRequest.podspec; path = ../SGHTTPRequest.podspec; sourceTree = "<group>"; };
-		4EE45BF33C2EA378150A1DD8 /* Pods-SGHTTPRequest_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SGHTTPRequest_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SGHTTPRequest_Tests/Pods-SGHTTPRequest_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6003F58F195388D20070C39A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		6003F591195388D20070C39A /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -31,7 +29,6 @@
 		6003F5B9195388D20070C39A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6003F5BB195388D20070C39A /* Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Tests.m; sourceTree = "<group>"; };
 		606FC2411953D9B200FFA9A0 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
-		B328F4327CE375BD3733167C /* Pods-SGHTTPRequest_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SGHTTPRequest_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SGHTTPRequest_Tests/Pods-SGHTTPRequest_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		BC82E6A67E1248BCD7110E2F /* libPods-SGHTTPRequestTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SGHTTPRequestTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2D24AAB908A14FD0714871B /* libPods-SGHTTPRequest_Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SGHTTPRequest_Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E96506CE40E8E5C596AFDE39 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -45,7 +42,6 @@
 				6003F5B0195388D20070C39A /* XCTest.framework in Frameworks */,
 				6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */,
-				74A85CC1C65D70162C84123C /* libPods-SGHTTPRequest_Tests.a in Frameworks */,
 				9D3805CAC74CCCEC9741DE5D /* libPods-SGHTTPRequestTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -117,8 +113,6 @@
 		8D59650947B7D6A1004BC53F /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				4EE45BF33C2EA378150A1DD8 /* Pods-SGHTTPRequest_Tests.debug.xcconfig */,
-				B328F4327CE375BD3733167C /* Pods-SGHTTPRequest_Tests.release.xcconfig */,
 				183C14A2491A7BD255D05EC5 /* Pods-SGHTTPRequestTests.debug.xcconfig */,
 				1E7CB0A476890EFC2DD2EE9B /* Pods-SGHTTPRequestTests.release.xcconfig */,
 			);
@@ -291,7 +285,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -324,7 +318,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
