@@ -9,7 +9,14 @@
 #import <XCTest/XCTest.h>
 #import "SGFileCache.h"
 
-#define SGTestCacheName @"SGTestCache"
+#define SGCacheNames @[@"SGTestCache", @"SGTestCache2", @"Illegal:/.,123{}!@#$%^&*()"]
+#define SGMultiTestCaches(tests) \
+            { \
+                NSString *testCache = nil; \
+                { tests } \
+                for (testCache in SGCacheNames) { \
+                    { tests } \
+            }   }
 
 // Some private file cache properties we want to test
 @interface SGFileCache ()
@@ -36,20 +43,39 @@
     XCTAssert([SGFileCache cacheFor:nil], @"Default file should be returned");
     XCTAssert([SGFileCache cacheFor:nil].cacheFolder.length, @"Default cache folder should have a length");
 
-    XCTAssert([SGFileCache cacheFor:SGTestCacheName].cacheFolder.length, @"Named cache should be returned");
-    XCTAssert([SGFileCache cacheFor:SGTestCacheName].cacheFolder.length, @"Named cache folder should be have a length");
+    SGMultiTestCaches(
+                      XCTAssert([SGFileCache cacheFor:testCache].cacheFolder.length, @"Named cache should be returned for cache named %@", testCache);
+                      XCTAssert([SGFileCache cacheFor:testCache].cacheFolder.length, @"Named cache folder should be have a length for cache named %@", testCache);
+                      );
 
+    NSString *cacheName1 = SGCacheNames.firstObject;
+    NSString *cacheName2 = SGCacheNames.lastObject;
     XCTAssertNotEqual([SGFileCache cacheFor:nil].cacheFolder,
-                      [SGFileCache cacheFor:SGTestCacheName].cacheFolder, @"Different caches should have different cache folders");
-
-    [self runTestsForCache:nil];
-    [self runTestsForCache:SGTestCacheName];
+                      [SGFileCache cacheFor:cacheName1].cacheFolder, @"Different caches should have different cache folders for nil and %@", cacheName1);
+    XCTAssertNotEqual([SGFileCache cacheFor:cacheName1].cacheFolder,
+                      [SGFileCache cacheFor:cacheName2].cacheFolder, @"Different caches should have different cache folders for %@ and %@", cacheName1, cacheName2);
 }
 
-- (void)runTestsForCache:(NSString *)cacheName {
-    XCTAssertNil([[SGFileCache cacheFor:cacheName] secondaryKeyValueNamed:nil forPrimaryKey:nil], @"Nil primary and secondary keys should return nil secondary key value");
-    XCTAssertNil([[SGFileCache cacheFor:cacheName] secondaryKeyValueNamed:nil forPrimaryKey:@"test_pk"], @"Nil secondary key should return nil secondary key value");
-    XCTAssertNil([[SGFileCache cacheFor:cacheName] secondaryKeyValueNamed:@"test_sk" forPrimaryKey:nil], @"Nil primary key should return nil secondary key value");
+- (void)testKeys {
+    SGMultiTestCaches(
+                 XCTAssertNil([[SGFileCache cacheFor:testCache] secondaryKeyValueNamed:nil forPrimaryKey:nil],
+                              @"Nil primary and secondary keys should return nil secondary key value for cache named %@", testCache);
+                 XCTAssertNil([[SGFileCache cacheFor:testCache] secondaryKeyValueNamed:nil forPrimaryKey:@"test_pk"],
+                              @"Nil secondary key should return nil secondary key value for cache named %@", testCache);
+                 XCTAssertNil([[SGFileCache cacheFor:testCache] secondaryKeyValueNamed:@"test_sk" forPrimaryKey:nil],
+                              @"Nil primary key should return nil secondary key value for cache named %@", testCache);
+                 );
+}
+
+- (void)testWriting {
+
+}
+
+- (void)testSyncReading {
+
+}
+
+- (void)testAsyncReading {
 
 }
 
@@ -59,6 +85,25 @@
   [self measureBlock:^{
       // Put the code you want to measure the time of here.
   }];
+}
+
+
+#pragma mark Convenience getters
+
+- (NSDictionary *)dataDictionary {
+
+}
+
+- (NSDictionary *)bigDataDictionary {
+
+}
+
+- (NSString *)dataString {
+
+}
+
+- (NSString *)bigDataString {
+
 }
 
 @end
