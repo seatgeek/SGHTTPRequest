@@ -112,6 +112,53 @@
 
 #pragma mark Data File Handling
 
+- (BOOL)hasCachedDataFor:(NSString *)primaryKey {
+    return [self hasCachedDataFor:primaryKey secondaryKeys:nil];
+}
+
+- (BOOL)hasCachedDataFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys {
+    return [self hasCachedDataFor:primaryKey secondaryKeys:secondaryKeys indexRef:nil indexPath:nil dataFilePath:nil];
+}
+
+- (BOOL)hasCachedDataFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys
+                indexRef:(NSDictionary **)indexRef indexPath:(NSString **)indexPathRef dataFilePath:(NSString **)dataFilePathRef {
+    if (!primaryKey.length) {
+        return nil;
+    }
+    NSString *indexPath = [self indexPathForPrimaryKey:primaryKey];
+    NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexPath];
+
+    for (NSString *key in secondaryKeys) {
+        if (![index[key] isEqualToString:secondaryKeys[key]]) {
+            return NO;     // keys to the data don't match.
+        }
+    }
+    if (!index[SGDataPath]) {
+        return NO;
+    }
+
+    NSString *fullDataPath = [self fullDataPathFromIndex:index];
+    if (![NSFileManager.defaultManager fileExistsAtPath:fullDataPath]) {
+        return NO;
+    }
+
+    if (indexRef) {
+        *indexRef = index;
+    }
+    if (indexPathRef) {
+        *indexPathRef = indexPath;
+    }
+    if (dataFilePathRef) {
+        *dataFilePathRef = fullDataPath;
+    }
+
+    return YES;
+}
+
+- (NSData *)cachedDataFor:(NSString *)primaryKey {
+    return [self cachedDataFor:primaryKey secondaryKeys:nil];
+}
+
 - (NSData *)cachedDataFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys {
     return [self cachedDataFor:primaryKey secondaryKeys:secondaryKeys newExpiryDate:nil updateExpiry:NO];
 }
@@ -136,18 +183,17 @@
 }
 
 - (NSData *)cachedDataFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys newExpiryDate:(NSDate *)newExpiryDate updateExpiry:(BOOL)updateExpiry {
-    if (!primaryKey.length) {
+    NSDictionary *index;
+    NSString *indexPath;
+    NSString *fullDataPath;
+
+    if (![self hasCachedDataFor:primaryKey secondaryKeys:secondaryKeys
+                       indexRef:&index indexPath:&indexPath dataFilePath:&fullDataPath]) {
         return nil;
     }
-    NSString *indexPath = [self indexPathForPrimaryKey:primaryKey];
-    NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexPath];
 
-    for (NSString *key in secondaryKeys) {
-        if (![index[key] isEqualToString:secondaryKeys[key]]) {
-            return nil;     // keys to the data don't match.
-        }
-    }
-    if (!index[SGDataPath]) {
+    if (!index || !indexPath || !fullDataPath) {
+        SGHTTPAssert(NO, @"This shouldn't happen");
         return nil;
     }
 
@@ -165,16 +211,19 @@
         }
     }
 
-    NSString *fullDataPath = [self fullDataPathFromIndex:index];
-    if (![NSFileManager.defaultManager fileExistsAtPath:fullDataPath]) {
-        return nil;
-    }
-
     // touch the date modified timestamp
     [NSFileManager.defaultManager setAttributes:@{NSFileModificationDate:NSDate.date}
                                    ofItemAtPath:fullDataPath
                                           error:nil];
     return [NSData dataWithContentsOfFile:fullDataPath];
+}
+
+- (void)cacheData:(NSData *)data for:(NSString *)primaryKey {
+    [self cacheData:data for:primaryKey secondaryKeys:nil expiryDate:nil];
+}
+
+- (void)cacheData:(NSData *)data for:(NSString *)primaryKey expiryDate:(NSDate *)expiryDate {
+    [self cacheData:data for:primaryKey secondaryKeys:nil expiryDate:expiryDate];
 }
 
 - (void)cacheData:(NSData *)data for:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys expiryDate:(NSDate *)expiryDate {

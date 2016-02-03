@@ -58,7 +58,24 @@
 - (BOOL)removeCacheFilesIfExpiredForPrimaryKey:(NSString *)key;
 
 /**
- * The cached raw data for the given secondary keys. nil if no cached data.
+ * Whether cached data exist for the given primary key
+ * returns YES if there is cached data matching the primary key
+ */
+- (BOOL)hasCachedDataFor:(NSString *)primaryKey;
+
+/**
+ * Whether cached data exist for the given primary and seconday keys.
+ * returns YES if there is cached data matching the primary and secondary key.
+ */
+- (BOOL)hasCachedDataFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys;
+
+/**
+ * The cached raw data for the given primary key. nil if no cached data.
+ * returns nil if no cached data matching the primary and secondary key.
+ */
+- (NSData *)cachedDataFor:(NSString *)primaryKey;
+/**
+ * The cached raw data for the given primary and secondary keys. nil if no cached data.
  * secondaryKeys is an optional dict of key -> value mappings (must match to return cache data)
  * returns nil if no cached data matching the primary and secondary key.
  */
@@ -76,6 +93,16 @@
  */
 - (void)getCachedDataAsyncFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys
                 newExpiryDate:(NSDate *)newExpiryDate dataCompletion:(void (^)(NSData *))dataCompletion;
+
+/**
+ * Cache the raw data for the given primary key, with no expiry date
+ */
+- (void)cacheData:(NSData *)data for:(NSString *)primaryKey;
+
+/**
+ * Cache the raw data for the given primary key, and update the expiry date
+ */
+- (void)cacheData:(NSData *)data for:(NSString *)primaryKey expiryDate:(NSDate *)expiryDate;
 
 /**
  * Cache the raw data for the given primary and secondary keys, and update the expiry date
