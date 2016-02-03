@@ -87,23 +87,4 @@
   }];
 }
 
-
-#pragma mark Convenience getters
-
-- (NSDictionary *)dataDictionary {
-
-}
-
-- (NSDictionary *)bigDataDictionary {
-
-}
-
-- (NSString *)dataString {
-
-}
-
-- (NSString *)bigDataString {
-
-}
-
 @end
