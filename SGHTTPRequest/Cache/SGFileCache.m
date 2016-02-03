@@ -49,7 +49,7 @@
             cache = SGFileCache.new;
 
             NSString *cacheFolder = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0];
-            cacheFolder = [cacheFolder stringByAppendingFormat:@"/SGFileCache/%@", cacheName];
+            cacheFolder = [cacheFolder stringByAppendingFormat:@"/com.seatgeek.sgfilecache/%@", cacheName];
             BOOL isDir;
             NSString *dataFolder = [cacheFolder stringByAppendingString:@"/Data"];
             if (![NSFileManager.defaultManager fileExistsAtPath:dataFolder isDirectory:&isDir]) {
