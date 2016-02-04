@@ -31,7 +31,7 @@
 @property (nonatomic, assign) NSUInteger defaultCacheMaxAge;
 
 /**
- * Sets the maximum size for the disk cache data.  Defaults to 100MB.  For unlimited,
+ * Sets the maximum size for the disk cache data.  Defaults to 20MB.  For unlimited,
  * set to zero.
  */
 @property (nonatomic, assign) NSUInteger maxDiskCacheSizeMB;

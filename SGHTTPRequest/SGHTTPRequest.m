@@ -24,6 +24,7 @@ SGHTTPLogging gLogging = SGHTTPLogNothing;
 @property (nonatomic, weak) AFHTTPRequestOperation *operation;
 @property (nonatomic, strong) NSData *responseData;
 @property (nonatomic, strong) NSString *responseString;
+@property (nonatomic, strong) NSDictionary *responseHeaders;
 @property (nonatomic, assign) NSInteger statusCode;
 @property (nonatomic, strong) NSError *error;
 @property (nonatomic, assign) BOOL cancelled;
@@ -307,9 +308,10 @@ void doOnMain(void(^block)()) {
         if (self.logResponses) {
             [self logResponse:operation error:nil];
         }
-        NSDictionary *reponseHeader = operation.response.allHeaderFields;
-        NSString *eTag = reponseHeader[@"Etag"];
-        NSString *cacheControlPolicy = reponseHeader[@"Cache-Control"];
+        NSDictionary *responseHeader = operation.response.allHeaderFields;
+        self.responseHeaders = responseHeader;
+        NSString *eTag = responseHeader[@"Etag"];
+        NSString *cacheControlPolicy = responseHeader[@"Cache-Control"];
         if ([cacheControlPolicy containsSubstring:@"no-cache"] ||
             [cacheControlPolicy containsSubstring:@"no-store"] ||
             [cacheControlPolicy containsSubstring:@"private"]) {

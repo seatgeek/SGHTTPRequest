@@ -180,6 +180,11 @@ a new identical request.
 - (id)responseJSON;
 
 /**
+ * An NSDictionary containing the response headers.
+ */
+- (NSDictionary *)responseHeaders;
+
+/**
 * The HTTP status code for both successful and failed requests.
 */
 - (NSInteger)statusCode;

@@ -8,6 +8,7 @@
 
 #import <XCTest/XCTest.h>
 #import "SGFileCache.h"
+#import "SGTestHelpers.h"
 
 #define SGCacheNames @[@"SGTestCache", @"SGTestCache2", @"Illegal:/.,123{}!@#$%^&*()"]
 #define SGMultiTestCaches(tests) \
@@ -23,11 +24,11 @@
 @property (nonatomic, strong) NSString *cacheFolder;
 @end
 
-@interface SGFileCacheTest : XCTestCase
+@interface SGFileCacheTests : XCTestCase
 
 @end
 
-@implementation SGFileCacheTest
+@implementation SGFileCacheTests
 
 - (void)setUp {
     [super setUp];
@@ -65,6 +66,38 @@
                  XCTAssertNil([[SGFileCache cacheFor:testCache] secondaryKeyValueNamed:@"test_sk" forPrimaryKey:nil],
                               @"Nil primary key should return nil secondary key value for cache named %@", testCache);
                  );
+}
+
+- (void)testFullCache {
+    SGMultiTestCaches(
+
+    SGFileCache *cache = [SGFileCache cacheFor:testCache];
+    cache.logCache = YES;
+    [cache clearCache];
+
+    [SGTestHelpers fillCache:cache startExpiryDate:[NSDate.date dateByAddingTimeInterval:30]];
+
+    NSDictionary *testDict = SGTestHelpers.testDataDict;
+    NSData *testData = [NSKeyedArchiver archivedDataWithRootObject:testDict];
+
+    [cache cacheData:testData for:@"testPK"];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"testFullCache completed"];
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSData *dataFromCache = [cache cachedDataFor:@"testPK"];
+        NSDictionary *dictFromCache = [NSKeyedUnarchiver unarchiveObjectWithData:dataFromCache];
+
+        XCTAssert([dictFromCache isEqualToDictionary:testDict], @"Data put in and out of the cache should be equal");
+
+        [cache clearCache]; // clean up
+        [expectation fulfill];
+    });
+    [self waitForExpectationsWithTimeout:10 handler:^(NSError *error) {
+        if (error) {
+            NSLog(@"Expectation Timeout Error: %@", error);
+        }}];
+    );  // end multi cache test
 }
 
 - (void)testWriting {

@@ -26,7 +26,7 @@
 - (id)init {
     self = [super init];
     self.defaultCacheMaxAge = 2592000;
-    self.maxDiskCacheSizeMB = 100;
+    self.maxDiskCacheSizeMB = 20;
     return self;
 }
 
@@ -42,6 +42,12 @@
     dispatch_once(&onceToken, ^{
         caches = NSMutableDictionary.new;
     });
+
+    NSCharacterSet *illegalFileNameChars = [NSCharacterSet characterSetWithCharactersInString:@":/"];
+    cacheName = [[cacheName componentsSeparatedByCharactersInSet:illegalFileNameChars] componentsJoinedByString:@"-"];
+    if (!cacheName.length) {
+        return nil;
+    }
 
     @synchronized(cacheName) {
         SGFileCache *cache = caches[cacheName];
@@ -297,6 +303,9 @@
 
     NSString *dataFolder = [self.cacheFolder stringByAppendingString:@"/Data"];
     NSURL *dataFolderURL = [NSURL URLWithString:dataFolder];
+    if (!dataFolderURL) {
+        return;
+    }
     NSArray *dataFilesArray = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:dataFolderURL
                                                             includingPropertiesForKeys:@[NSURLContentModificationDateKey,
                                                                                          NSURLFileSizeKey]
@@ -482,7 +491,9 @@
     }
 
     for (NSString *filePath in indexFilesArray) {
-        if ([NSFileManager.defaultManager fileExistsAtPath:filePath]) {
+        BOOL isDirectory = NO;
+        BOOL exists = [NSFileManager.defaultManager fileExistsAtPath:filePath isDirectory:&isDirectory];
+        if (exists && !isDirectory) {
             [NSFileManager.defaultManager removeItemAtPath:filePath error:nil];
         }
     }
