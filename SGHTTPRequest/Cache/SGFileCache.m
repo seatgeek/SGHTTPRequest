@@ -129,7 +129,7 @@
 - (BOOL)hasCachedDataFor:(NSString *)primaryKey secondaryKeys:(NSDictionary *)secondaryKeys
                 indexRef:(NSDictionary **)indexRef indexPath:(NSString **)indexPathRef dataFilePath:(NSString **)dataFilePathRef {
     if (!primaryKey.length) {
-        return nil;
+        return NO;
     }
     NSString *indexPath = [self indexPathForPrimaryKey:primaryKey];
     NSDictionary *index = [NSDictionary dictionaryWithContentsOfFile:indexPath];
