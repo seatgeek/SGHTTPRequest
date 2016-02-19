@@ -11,5 +11,5 @@ Pod::Spec.new do |s|
   s.source_files = 'SGHTTPRequest/**/*.{h,m}'
   s.requires_arc  = true
   s.dependency    "AFNetworking", '~>3.0'
-  s.dependency    "MGEvents/Core"
+  s.dependency    "MGEvents", '~> 1.1'
 end
