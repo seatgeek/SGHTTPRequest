@@ -7,11 +7,12 @@
 //
 
 #import "SGHTTPRequest.h"
-#import "AFNetworking.h"
+#import <AFNetworking/AFNetworking.h>
 #import "SGActivityIndicator.h"
 #import "SGHTTPRequestDebug.h"
 #import "NSString+SGHTTPRequest.h"
 #import <SGHTTPRequest/SGFileCache.h>
+#import "MGEvents.h"
 
 #define SGETag              @"eTag"
 
@@ -21,7 +22,7 @@ NSMutableDictionary *gRetryQueues;
 SGHTTPLogging gLogging = SGHTTPLogNothing;
 
 @interface SGHTTPRequest ()
-@property (nonatomic, weak) AFHTTPRequestOperation *operation;
+@property (nonatomic, weak) NSURLSessionDataTask *sessionTask;
 @property (nonatomic, strong) NSData *responseData;
 @property (nonatomic, strong) NSString *responseString;
 @property (nonatomic, strong) NSDictionary *responseHeaders;
@@ -111,11 +112,11 @@ void doOnMain(void(^block)()) {
         NSLog(@"%@", self.url);
     }
 
-    AFHTTPRequestOperationManager *manager = [self.class managerForBaseURL:baseURL
+    AFHTTPSessionManager *manager = [self.class managerForBaseURL:baseURL
           requestType:self.requestFormat responseType:self.responseFormat];
 
     if (!manager) {
-        [self failedWithError:nil operation:nil retryURL:baseURL];
+        [self failedWithError:nil task:nil retryURL:baseURL];
         return;
     }
 
@@ -141,62 +142,65 @@ void doOnMain(void(^block)()) {
         manager.requestSerializer.cachePolicy = NSURLRequestUseProtocolCachePolicy;
     }
 
-    id success = ^(AFHTTPRequestOperation *operation, id responseObject) {
-        [self success:operation];
+    id success = ^(NSURLSessionTask *task, id responseObject) {
+        [self success:task responseObject:responseObject];
     };
-    id failure = ^(AFHTTPRequestOperation *operation, NSError *error) {
-        if (operation.response.statusCode == 304) { // not modified
-            [self success:operation];
+    id failure = ^(NSURLSessionTask *task, NSError *error) {
+        if (((NSHTTPURLResponse*)task.response).statusCode == 304) { // not modified
+            [self success:task responseObject:nil];
         } else {
-            [self failedWithError:error operation:operation retryURL:baseURL];
+            [self failedWithError:error task:task retryURL:baseURL];
         }
     };
 
     switch (self.method) {
         case SGHTTPRequestMethodGet:
-            _operation = [manager GET:self.url.absoluteString parameters:self.parameters
-                  success:success failure:failure];
+            _sessionTask = [manager GET:self.url.absoluteString parameters:self.parameters
+                                    progress:nil success:success failure:failure];
             break;
         case SGHTTPRequestMethodPost:
-            _operation = [manager POST:self.url.absoluteString parameters:self.parameters
-                  success:success failure:failure];
+            _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
+                                    progress:nil success:success failure:failure];
             break;
         case SGHTTPRequestMethodMultipartPost:
             {
             __weak SGHTTPRequest *me = self;
-            _operation = [manager POST:self.url.absoluteString parameters:self.parameters
-             constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-                 [formData appendPartWithFileData:me.multiPartData
-                                             name:me.multiPartName
-                                         fileName:me.multiPartFilename
-                                         mimeType:me.multiPartMimeType];
-                  }
-                  success:success failure:failure];
+            _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
+               constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+                   [formData appendPartWithFileData:me.multiPartData
+                                               name:me.multiPartName
+                                           fileName:me.multiPartFilename
+                                           mimeType:me.multiPartMimeType];
+               } progress:nil success:success failure:failure];
              }
             break;
         case SGHTTPRequestMethodDelete:
-            _operation = [manager DELETE:self.url.absoluteString parameters:self.parameters
-                  success:success failure:failure];
+            _sessionTask = [manager DELETE:self.url.absoluteString
+                                    parameters:self.parameters success:success failure:failure];
             break;
         case SGHTTPRequestMethodPut:
-            _operation = [manager PUT:self.url.absoluteString parameters:self.parameters
-                  success:success failure:failure];
+            _sessionTask = [manager PUT:self.url.absoluteString
+                                    parameters:self.parameters success:success failure:failure];
             break;
         case SGHTTPRequestMethodPatch:
-            _operation = [manager PATCH:self.url.absoluteString parameters:self.parameters
-                  success:success failure:failure];
+            _sessionTask = [manager PATCH:self.url.absoluteString
+                                    parameters:self.parameters success:success failure:failure];
             break;
     }
 
     __weak typeof(self) me = self;
     if (self.onUploadProgress) {
-        [_operation setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite) {
-            me.onUploadProgress(totalBytesWritten, totalBytesExpectedToWrite);
+        NSProgress *progress = [manager uploadProgressForTask:_sessionTask];
+        __weak NSProgress *wProgress = progress;
+        [progress onChangeOf:@"fractionCompleted" do:^{
+            me.onUploadProgress(wProgress.fractionCompleted);
         }];
     }
     if (self.onDownloadProgress) {
-        [_operation setDownloadProgressBlock:^(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead) {
-            me.onDownloadProgress(totalBytesRead, totalBytesExpectedToRead);
+        NSProgress *progress = [manager downloadProgressForTask:_sessionTask];
+        __weak NSProgress *wProgress = progress;
+        [progress onChangeOf:@"fractionCompleted" do:^{
+            me.onDownloadProgress(wProgress.fractionCompleted);
         }];
     }
 
@@ -213,7 +217,7 @@ void doOnMain(void(^block)()) {
            [SGHTTPRequest removeRetryCompletion:self.onNetworkReachable forHost:self.url.host];
             self.onNetworkReachable = nil;
         }
-        [_operation cancel]; // will call the failure block
+        [_sessionTask cancel]; // will call the failure block
     });
 }
 
@@ -240,16 +244,16 @@ void doOnMain(void(^block)()) {
     return self;
 }
 
-+ (AFHTTPRequestOperationManager *)managerForBaseURL:(NSString *)baseURL
-                                         requestType:(SGHTTPDataType)requestType
-                                        responseType:(SGHTTPDataType)responseType {
++ (AFHTTPSessionManager *)managerForBaseURL:(NSString *)baseURL
+                                requestType:(SGHTTPDataType)requestType
+                               responseType:(SGHTTPDataType)responseType {
     static dispatch_once_t token = 0;
     dispatch_once(&token, ^{
         gReachabilityManagers = NSMutableDictionary.new;
     });
 
     NSURL *url = [NSURL URLWithString:baseURL];
-    AFHTTPRequestOperationManager *manager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:url];
+    AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:url];
     if (!manager) {
         return nil;
     }
@@ -268,6 +272,7 @@ void doOnMain(void(^block)()) {
         manager.requestSerializer = AFJSONRequestSerializer.serializer;
     }
 
+#if !TARGET_OS_WATCH
     @synchronized(self) {
         if (url.host.length && !gReachabilityManagers[url.host]) {
             AFNetworkReachabilityManager *reacher = [AFNetworkReachabilityManager managerForDomain:url
@@ -290,25 +295,45 @@ void doOnMain(void(^block)()) {
             }
         }
     }
+#endif
 
     return manager;
 }
 
 #pragma mark - Success / Fail Handlers
 
-- (void)success:(AFHTTPRequestOperation *)operation {
+- (void)success:(NSURLSessionTask *)task responseObject:(id)responseObject {
     if (self.showActivityIndicator) {
         [SGHTTPRequest.networkIndicator decrementActivityCount];
     }
 
-    self.responseData = operation.responseData;
-    self.responseString = operation.responseString;
-    self.statusCode = operation.response.statusCode;
+    NSData *responseData = nil;
+    NSString *responseString = nil;
+
+    if ([responseObject isKindOfClass:NSDictionary.class]) {
+        responseData = [NSJSONSerialization dataWithJSONObject:responseObject
+                                                           options:NSJSONWritingPrettyPrinted
+                                                             error:nil];
+        if (responseData) {
+            responseString = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+        }
+    } else if ([responseObject isKindOfClass:NSString.class]) {
+        responseData = [responseObject dataUsingEncoding:NSUTF8StringEncoding];
+        responseString = responseObject;
+    } else if ([responseObject isKindOfClass:NSData.class]) {
+        responseData = responseObject;
+    } else if (responseObject) {
+        SGHTTPAssert(NO, @"SGHTTPRequest success:responseObject: Unexpected responseObject type for %@", responseObject);
+    }
+    
+    self.responseData = responseData;
+    self.responseString = responseString;
+    self.statusCode = ((NSHTTPURLResponse*)task.response).statusCode;
     if (!self.cancelled) {
         if (self.logResponses) {
-            [self logResponse:operation error:nil];
+            [self logResponse:task error:nil];
         }
-        NSDictionary *responseHeader = operation.response.allHeaderFields;
+        NSDictionary *responseHeader = ((NSHTTPURLResponse*)task.response).allHeaderFields;
         self.responseHeaders = responseHeader;
         NSString *eTag = responseHeader[@"Etag"];
         NSString *cacheControlPolicy = responseHeader[@"Cache-Control"];
@@ -378,7 +403,7 @@ void doOnMain(void(^block)()) {
     }
 }
 
-- (void)failedWithError:(NSError *)error operation:(AFHTTPRequestOperation *)operation
+- (void)failedWithError:(NSError *)error task:(NSURLSessionTask *)task
       retryURL:(NSString *)retryURL {
     if (self.showActivityIndicator) {
         [SGHTTPRequest.networkIndicator decrementActivityCount];
@@ -388,13 +413,14 @@ void doOnMain(void(^block)()) {
         return;
     }
 
+    NSData *responseData = error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey];
     self.error = error;
-    self.responseData = operation.responseData;
-    self.responseString = operation.responseString;
-    self.statusCode = operation.response.statusCode;
+    self.responseData = responseData;
+    self.responseString = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+    self.statusCode =  ((NSHTTPURLResponse*)task.response).statusCode;
 
     if (self.logErrors) {
-        [self logResponse:operation error:error];
+        [self logResponse:task error:error];
     }
 
     if (self.onFailure) {
@@ -620,16 +646,15 @@ static BOOL gAllowNSNulls = YES;
     return boxString;
 }
 
-- (void)logResponse:(AFHTTPRequestOperation *)operation error:(NSError *)error {
+- (void)logResponse:(NSURLSessionTask *)task error:(NSError *)error {
     NSString *responseString = self.responseString;
     NSObject *requestParameters = self.parameters;
-    NSString *requestMethod = operation.request.HTTPMethod ?: @"";
+    NSString *requestMethod = task.originalRequest.HTTPMethod ?: @"";
 
     if (self.responseData &&
-        [operation.responseSerializer isKindOfClass:AFJSONResponseSerializer.class] &&
-        [NSJSONSerialization isValidJSONObject:operation.responseObject]) {
+        [NSJSONSerialization isValidJSONObject:self.responseData]) {
         NSError *error;
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:operation.responseObject
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:self.responseData
                                                            options:NSJSONWritingPrettyPrinted
                                                              error:&error];
         if (jsonData) {

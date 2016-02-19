@@ -9,6 +9,7 @@
 #import "SGFileCache.h"
 #import <SGHTTPRequest/NSString+SGHTTPRequest.h>
 #import <SGHTTPRequest/SGHTTPRequestDebug.h>
+#import <UIKit/UIKit.h>
 
 #define SGDataPath          @"dataPath"
 #define SGExpiryDate        @"expires"
