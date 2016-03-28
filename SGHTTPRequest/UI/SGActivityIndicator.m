@@ -35,7 +35,9 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(turnOffIndicator)
           object:nil];
 #ifndef SG_APP_EXTENSIONS
+#if !TARGET_OS_WATCH
     [UIApplication.sharedApplication setNetworkActivityIndicatorVisible:YES];
+#endif
 #endif
     _indicatorVisible = YES;
 }
@@ -45,7 +47,9 @@
         return;
     }
 #ifndef SG_APP_EXTENSIONS
+#if !TARGET_OS_WATCH
     [UIApplication.sharedApplication setNetworkActivityIndicatorVisible:NO];
+#endif
 #endif
     _indicatorVisible = NO;
 }
