@@ -13,60 +13,99 @@ pod 'SGHTTPRequest'
 
 ### Example GET Request
 
+##### Objective-C
 ```objc
-- (void)requestThings {
-    NSURL *url = [NSURL URLWithString:@"http://example.com/things"];
+NSURL *url = [NSURL URLWithString:@"http://example.com/things"];
 
-    // create a GET request
-    SGHTTPRequest *req = [SGHTTPRequest requestWithURL:url];
+// create a GET request
+SGHTTPRequest *req = [SGHTTPRequest requestWithURL:url];
 
-    // start the request in the background
-    [req start];
-}
+// start the request in the background
+[req start];
+```
+##### Swift
+```swift
+let url = NSURL(string: "http://example.com/things")
+
+// create a GET request
+let req = SGHTTPRequest(URL: url)
+
+// start the request in the background
+req.start()
 ```
 
 ### Example POST Request
 
+##### Objective-C
 ```objc
-- (void)requestThings {
-    NSURL *url = [NSURL URLWithString:@"http://example.com/things"];
+NSURL *url = [NSURL URLWithString:@"http://example.com/things"];
 
-    // create a POST request
-    SGHTTPRequest *req = [SGHTTPRequest postRequestWithURL:url];
+// create a POST request
+SGHTTPRequest *req = [SGHTTPRequest postRequestWithURL:url];
 
-    // set the POST fields
-    req.parameters = @{@"field": @"value"};
+// set the POST fields
+req.parameters = @{@"field": @"value"};
 
-    // start the request in the background
-    [req start];
-}
+// start the request in the background
+[req start];
+```
+##### Swift
+```swift
+let url = NSURL(string: "http://example.com/things")
+
+// create a GET request
+let req = SGHTTPRequest.postRequestWithURL(url)
+
+// set the POST fields
+req.parameters = ["field": "value"]
+
+// start the request in the background
+req.start()
 ```
 
 ### Example with Success and Failure Handlers
 
 If a request succeeds, the optional `onSuccess` block is called. If a request fails for any reason, the optional `onFailure` block is called.
 
+##### Objective-C
 ```objc
-- (void)requestThings {
-    NSURL *url = [NSURL URLWithString:@"http://example.com/things"];
+NSURL *url = [NSURL URLWithString:@"http://example.com/things"];
+// create a GET request
+SGHTTPRequest *req = [SGHTTPRequest requestWithURL:url];
 
-    // create a GET request
-    SGHTTPRequest *req = [SGHTTPRequest requestWithURL:url];
+// optional success handler
+req.onSuccess = ^(SGHTTPRequest *_req) {
+    NSLog(@"response:%@", _req.responseString);
+};
 
-    // optional success handler
-    req.onSuccess = ^(SGHTTPRequest *_req) {
-        NSLog(@"response:%@", _req.responseString);
-    };
+// optional failure handler
+req.onFailure = ^(SGHTTPRequest *_req) {
+    NSLog(@"error:%@", _req.error);
+    NSLog(@"status code:%d", _req.statusCode);
+};
 
-    // optional failure handler
-    req.onFailure = ^(SGHTTPRequest *_req) {
-        NSLog(@"error:%@", _req.error);
-        NSLog(@"status code:%d", _req.statusCode);
-    };
+// start the request in the background
+[req start];
+```
+##### Swift
+```swift
+let url = NSURL(string: "http://example.com/things")
+// create a GET request
+let req = SGHTTPRequest(URL: url)
 
-    // start the request in the background
-    [req start];
+// optional success handler
+req.onSuccess = {(request) in
+    NSLog("response: %@", request.responseString())
 }
+
+// optional failure handler
+req.onFailure = {(request) in
+    NSLog("error: %@", request.error())
+    NSLog("status code: %d", request.statusCode())
+}
+
+// start the request in the background
+req.start()
 ```
 
 ### Example with Retry Handler
