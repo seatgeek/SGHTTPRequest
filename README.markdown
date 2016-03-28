@@ -116,6 +116,7 @@ This is useful for silently retrying on unreliable connections, thus eliminating
 
 The easiest way to implement this is to contain your request code in a method, and call back to that method in your `onNetworkReachable` block, thus firing off a new identical request.
 
+##### Objective-C
 ```objc
 - (void)requestThings {
     NSURL *url = [NSURL URLWithString:@"http://example.com/things"];
@@ -132,6 +133,24 @@ The easiest way to implement this is to contain your request code in a method, a
 
     // start the request in the background
     [req start];
+}
+```
+##### Swift
+```swift
+func requestThings() {
+    let url = NSURL(string: "http://example.com/things")
+    // create a GET request
+    let req = SGHTTPRequest(URL: url)
+
+    // optional success handler
+    req.onNetworkReachable = { [weak self] in
+        if let strongSelf = self {
+            strongSelf.requestThings()
+        }
+    }
+
+    // start the request in the background
+    req.start()
 }
 ```
 
