@@ -1,3 +1,16 @@
+## 1.7.0
+
+- Added support for watchOS 2
+- SGHTTPRequest is now based on AFNetworking 3
+- Reduced default disk cache size to 20MB
+- Moved disk cache location to new folder
+- Added some unit tests and continuous integration with Travis CI
+
+## 1.6.0
+
+- New SGHTTPLogCache flag to enable / disable ETag cache flushing debug logs
+- New disk cache backend
+
 ## 1.5.0
 
 - Added upload and download progress blocks for easy upload and download handling
