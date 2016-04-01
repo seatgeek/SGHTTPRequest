@@ -125,11 +125,15 @@ typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
 /**
  * Called as request upload progresses. Client code that needs to update a progress
  * view etc can use this.
+ *
+ * NOTE: May be called on background thread.
  */
 @property (nonatomic, copy) SGHTTPProgressBlock onUploadProgress;
 
 /**
  * Called as reponse download progresses.
+ *
+ * NOTE: May be called on background thread.
  */
 @property (nonatomic, copy) SGHTTPProgressBlock onDownloadProgress;
 
