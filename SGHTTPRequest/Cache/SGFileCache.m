@@ -453,6 +453,74 @@
     [self removeCacheFilesForIndexPath:[self indexPathForPrimaryKey:key]];
 }
 
+- (void)removeCacheFilesForPrimaryKeys:(NSArray *)keys {
+    for (NSString *key in keys) {
+        [self removeCacheFilesForPrimaryKey:key];
+    }
+}
+
+- (void)removeCacheFilesNotMatchingPrimaryKeys:(NSArray *)keys {
+    if (!keys.count) {
+        return;
+    }
+
+    SGHTTPAssert([NSThread isMainThread], @"This must be run from the main thread");
+
+    NSMutableArray *remainingIndexPathsToCheck = NSMutableArray.new;
+    for (NSString *key in keys) {
+        NSString *indexFileName = [NSURL fileURLWithPath:[self indexPathForPrimaryKey:key]].absoluteString.lastPathComponent;
+        if (indexFileName) {
+            [remainingIndexPathsToCheck addObject:indexFileName];
+        }
+    }
+
+    NSString *indexFolder = self.cacheFolder;
+    NSArray *indexFilesArray = [NSFileManager.defaultManager contentsOfDirectoryAtURL:[NSURL URLWithString:indexFolder]
+                                                           includingPropertiesForKeys:@[NSURLNameKey, NSURLIsDirectoryKey]
+                                                                              options:NSDirectoryEnumerationSkipsHiddenFiles|NSDirectoryEnumerationSkipsSubdirectoryDescendants
+                                                                                error:nil];
+    NSMutableArray *filesToDelete = NSMutableArray.new;
+
+    for (NSURL *fileURL in indexFilesArray) {
+        NSError *error;
+        NSNumber *isDirectory;
+        [fileURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error];
+        if (error || isDirectory.boolValue) {
+            continue;
+        }
+
+        NSString *fileName;
+        [fileURL getResourceValue:&fileName forKey:NSURLNameKey error:&error];
+        if (error) {
+            continue;
+        }
+
+        BOOL found = NO;
+        for (NSString *fileToKeep in remainingIndexPathsToCheck) {
+            if ([fileToKeep isEqualToString:fileName]) {
+                found = YES;
+                [remainingIndexPathsToCheck removeObject:fileToKeep];
+                break;
+            }
+        }
+        if (!found) {
+            [filesToDelete addObject:fileURL];
+        }
+    }
+
+    if (!filesToDelete.count) {
+        return;
+    }
+
+    if (self.logCache) {
+        NSLog(@"Flushing %@ files not matching primary keys from %@ cache", @(filesToDelete.count), self.cacheFolder);
+    }
+
+    for (NSURL *indexFileURL in filesToDelete) {
+        [self removeCacheFilesForIndexPath:indexFileURL.path];
+    }
+}
+
 - (BOOL)removeCacheFilesIfExpiredForPrimaryKey:(NSString *)key {
     return [self removeCacheFilesIfExpiredForIndexPath:[self indexPathForPrimaryKey:key]];
 }

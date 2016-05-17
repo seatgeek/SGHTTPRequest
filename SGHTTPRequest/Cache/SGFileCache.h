@@ -52,6 +52,16 @@
 - (void)removeCacheFilesForPrimaryKey:(NSString *)key;
 
 /**
+ * Remove all cached data that does not match the given primary keys.
+ */
+- (void)removeCacheFilesNotMatchingPrimaryKeys:(NSArray *)keys;
+
+/**
+ * Remove the cached data for the given keys if they exist.
+ */
+- (void)removeCacheFilesForPrimaryKeys:(NSArray *)keys;
+
+/**
  * Remove the cached data for the given key if it has expired.
  * Returns YES if files are removed.
  */
