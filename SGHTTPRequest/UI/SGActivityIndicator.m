@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 SeatGeek. All rights reserved.
 //
 
+#ifndef SG_EXCLUDE_UIKIT
+
 #import "SGActivityIndicator.h"
 
 @implementation SGActivityIndicator {
@@ -34,10 +36,8 @@
     }
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(turnOffIndicator)
           object:nil];
-#ifndef SG_APP_EXTENSIONS
-#if !TARGET_OS_WATCH
+#if TARGET_OS_IOS
     [UIApplication.sharedApplication setNetworkActivityIndicatorVisible:YES];
-#endif
 #endif
     _indicatorVisible = YES;
 }
@@ -46,10 +46,8 @@
     if (!_indicatorVisible) {
         return;
     }
-#ifndef SG_APP_EXTENSIONS
-#if !TARGET_OS_WATCH
+#if TARGET_OS_IOS
     [UIApplication.sharedApplication setNetworkActivityIndicatorVisible:NO];
-#endif
 #endif
     _indicatorVisible = NO;
 }
@@ -61,3 +59,5 @@
 }
 
 @end
+
+#endif

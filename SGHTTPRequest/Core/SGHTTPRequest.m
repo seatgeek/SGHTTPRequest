@@ -8,7 +8,9 @@
 
 #import "SGHTTPRequest.h"
 #import <AFNetworking/AFNetworking.h>
+#ifndef SG_EXCLUDE_UIKIT
 #import "SGActivityIndicator.h"
+#endif
 #import "SGHTTPRequestDebug.h"
 #import "NSString+SGHTTPRequest.h"
 #import <SGHTTPRequest/SGFileCache.h>
@@ -17,7 +19,9 @@
 #define SGETag              @"eTag"
 
 NSMutableDictionary *gReachabilityManagers;
+#ifndef SG_EXCLUDE_UIKIT
 SGActivityIndicator *gNetworkIndicator;
+#endif
 NSMutableDictionary *gRetryQueues;
 SGHTTPLogging gLogging = SGHTTPLogNothing;
 
@@ -204,9 +208,11 @@ void doOnMain(void(^block)()) {
         }];
     }
 
+#ifndef SG_EXCLUDE_UIKIT
     if (self.showActivityIndicator) {
         [SGHTTPRequest.networkIndicator incrementActivityCount];
     }
+#endif
 }
 
 - (void)cancel {
@@ -303,9 +309,11 @@ void doOnMain(void(^block)()) {
 #pragma mark - Success / Fail Handlers
 
 - (void)success:(NSURLSessionTask *)task responseObject:(id)responseObject {
+#ifndef SG_EXCLUDE_UIKIT
     if (self.showActivityIndicator) {
         [SGHTTPRequest.networkIndicator decrementActivityCount];
     }
+#endif
 
     NSData *responseData = nil;
     NSString *responseString = nil;
@@ -405,9 +413,12 @@ void doOnMain(void(^block)()) {
 
 - (void)failedWithError:(NSError *)error task:(NSURLSessionTask *)task
       retryURL:(NSString *)retryURL {
+
+#ifndef SG_EXCLUDE_UIKIT
     if (self.showActivityIndicator) {
         [SGHTTPRequest.networkIndicator decrementActivityCount];
     }
+#endif
 
     if (self.cancelled) {
         return;
@@ -483,6 +494,7 @@ void doOnMain(void(^block)()) {
     return [NSString stringWithFormat:@"%@://%@/", url.scheme, url.host];
 }
 
+#ifndef SG_EXCLUDE_UIKIT
 + (SGActivityIndicator *)networkIndicator {
     if (gNetworkIndicator) {
         return gNetworkIndicator;
@@ -490,6 +502,7 @@ void doOnMain(void(^block)()) {
     gNetworkIndicator = [[SGActivityIndicator alloc] init];
     return gNetworkIndicator;
 }
+#endif
 
 #pragma mark - ETag Caching
 
