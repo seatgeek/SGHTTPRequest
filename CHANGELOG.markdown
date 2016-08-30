@@ -1,3 +1,7 @@
+## 1.8.1
+
+- Better handling of watchOS integration. No more AppExtension subspec.
+
 ## 1.8.0
 
 - Restructured pod spec to work better with Cocoapods 1.0 and App Extensions. Specify SGHTTPRequest/AppExtension if you wish to use SGHTTPRequest in an App Extension
