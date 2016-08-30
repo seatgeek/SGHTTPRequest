@@ -1,3 +1,8 @@
+## 1.8.0
+
+- Restructured pod spec to work better with Cocoapods 1.0 and App Extensions. Specify SGHTTPRequest/AppExtension if you wish to use SGHTTPRequest in an App Extension
+- Added the ability to remove cache files not matching an array of primary keys, and to remove cache files matching an array of primary keys
+
 ## 1.7.0
 
 - Added support for watchOS 2
