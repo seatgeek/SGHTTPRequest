@@ -6,9 +6,13 @@
 //  Copyright (c) 2013 SeatGeek. All rights reserved.
 //
 
+#ifndef TARGET_OS_IOS
+#undef SG_INCLUDE_UIKIT
+#endif
+
 #import "SGHTTPRequest.h"
 #import <AFNetworking/AFNetworking.h>
-#ifndef SG_EXCLUDE_UIKIT
+#ifdef SG_INCLUDE_UIKIT
 #import "SGActivityIndicator.h"
 #endif
 #import "SGHTTPRequestDebug.h"
@@ -19,7 +23,7 @@
 #define SGETag              @"eTag"
 
 NSMutableDictionary *gReachabilityManagers;
-#ifndef SG_EXCLUDE_UIKIT
+#ifdef SG_INCLUDE_UIKIT
 SGActivityIndicator *gNetworkIndicator;
 #endif
 NSMutableDictionary *gRetryQueues;
@@ -208,7 +212,7 @@ void doOnMain(void(^block)()) {
         }];
     }
 
-#ifndef SG_EXCLUDE_UIKIT
+#ifdef SG_INCLUDE_UIKIT
     if (self.showActivityIndicator) {
         [SGHTTPRequest.networkIndicator incrementActivityCount];
     }
@@ -309,7 +313,7 @@ void doOnMain(void(^block)()) {
 #pragma mark - Success / Fail Handlers
 
 - (void)success:(NSURLSessionTask *)task responseObject:(id)responseObject {
-#ifndef SG_EXCLUDE_UIKIT
+#ifdef SG_INCLUDE_UIKIT
     if (self.showActivityIndicator) {
         [SGHTTPRequest.networkIndicator decrementActivityCount];
     }
@@ -414,7 +418,7 @@ void doOnMain(void(^block)()) {
 - (void)failedWithError:(NSError *)error task:(NSURLSessionTask *)task
       retryURL:(NSString *)retryURL {
 
-#ifndef SG_EXCLUDE_UIKIT
+#ifdef SG_INCLUDE_UIKIT
     if (self.showActivityIndicator) {
         [SGHTTPRequest.networkIndicator decrementActivityCount];
     }
@@ -494,7 +498,7 @@ void doOnMain(void(^block)()) {
     return [NSString stringWithFormat:@"%@://%@/", url.scheme, url.host];
 }
 
-#ifndef SG_EXCLUDE_UIKIT
+#ifdef SG_INCLUDE_UIKIT
 + (SGActivityIndicator *)networkIndicator {
     if (gNetworkIndicator) {
         return gNetworkIndicator;

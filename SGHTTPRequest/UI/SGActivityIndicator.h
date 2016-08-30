@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 SeatGeek. All rights reserved.
 //
 
-#ifndef SG_EXCLUDE_UIKIT
+#ifdef TARGET_OS_IOS
 
 @interface SGActivityIndicator : NSObject
 
