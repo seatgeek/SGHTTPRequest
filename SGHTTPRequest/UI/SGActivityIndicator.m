@@ -36,9 +36,9 @@
     }
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(turnOffIndicator)
           object:nil];
-#if TARGET_OS_IOS
-    [UIApplication.sharedApplication setNetworkActivityIndicatorVisible:YES];
-#endif
+
+    [self.sharedApplication setNetworkActivityIndicatorVisible:YES];
+
     _indicatorVisible = YES;
 }
 
@@ -46,9 +46,7 @@
     if (!_indicatorVisible) {
         return;
     }
-#if TARGET_OS_IOS
-    [UIApplication.sharedApplication setNetworkActivityIndicatorVisible:NO];
-#endif
+    [self.sharedApplication setNetworkActivityIndicatorVisible:NO];
     _indicatorVisible = NO;
 }
 
@@ -56,6 +54,19 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(turnOffIndicator)
           object:nil];
     [self performSelector:@selector(turnOffIndicator) withObject:nil afterDelay:0.2];
+}
+
+- (UIApplication *)sharedApplication {
+    // xcode throws compiler errors if you try use UIApplication.sharedApplication inside the today widget.
+    // We also need to make sure we're not in an app extension since the performSelector will still work
+    // if we work around the compiler error, but it's still not allowed by Apple.
+    if ([NSBundle.mainBundle.bundlePath hasSuffix:@".appex"]) {
+        return nil;
+    }
+    if (![UIApplication respondsToSelector:@selector(sharedApplication)]) {
+        return nil;
+    }
+    return [UIApplication performSelector:@selector(sharedApplication)];
 }
 
 @end
