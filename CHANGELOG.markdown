@@ -1,3 +1,7 @@
+## 1.8.2
+
+- The main SHTTPRequest pod now works happily in today extensions (no need for setting any macros in project settings)
+
 ## 1.8.1
 
 - Better handling of watchOS integration. No more AppExtension subspec.
