@@ -22,6 +22,7 @@
 
 #define SGETag              @"eTag"
 
+NSMutableDictionary *gSessionManagers;
 NSMutableDictionary *gReachabilityManagers;
 #ifdef SG_INCLUDE_UIKIT
 SGActivityIndicator *gNetworkIndicator;
@@ -259,27 +260,37 @@ void doOnMain(void(^block)()) {
                                responseType:(SGHTTPDataType)responseType {
     static dispatch_once_t token = 0;
     dispatch_once(&token, ^{
+        gSessionManagers = NSMutableDictionary.new;
         gReachabilityManagers = NSMutableDictionary.new;
     });
 
     NSURL *url = [NSURL URLWithString:baseURL];
-    AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:url];
-    if (!manager) {
-        return nil;
-    }
-
-    //responses default to JSON
-    if (responseType == SGHTTPDataTypeHTTP) {
-        manager.responseSerializer = AFHTTPResponseSerializer.serializer;
-    } else if (responseType == SGHTTPDataTypeXML) {
-        manager.responseSerializer = AFXMLParserResponseSerializer.serializer;
-    }
-
-    if (requestType == SGHTTPDataTypeXML) {
-        AFHTTPRequestSerializer *requestSerializer = manager.requestSerializer;
-        [requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Content-Type"];
-    } else if (requestType == SGHTTPDataTypeJSON) {
-        manager.requestSerializer = AFJSONRequestSerializer.serializer;
+    AFHTTPSessionManager *manager;
+    // We want one manager per unique baseUrl–requestType-responseType tuple
+    NSString *key = [NSString stringWithFormat:@"%@,%d,%d", baseURL, requestType, responseType];
+    @synchronized(self) {
+        if (gSessionManagers[key]) {
+            manager = gSessionManagers[key];
+        } else {
+            manager = [[AFHTTPSessionManager alloc] initWithBaseURL:url];
+            if (manager) {
+                //responses default to JSON
+                if (responseType == SGHTTPDataTypeHTTP) {
+                    manager.responseSerializer = AFHTTPResponseSerializer.serializer;
+                } else if (responseType == SGHTTPDataTypeXML) {
+                    manager.responseSerializer = AFXMLParserResponseSerializer.serializer;
+                }
+                if (requestType == SGHTTPDataTypeXML) {
+                    AFHTTPRequestSerializer *requestSerializer = manager.requestSerializer;
+                    [requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Content-Type"];
+                } else if (requestType == SGHTTPDataTypeJSON) {
+                    manager.requestSerializer = AFJSONRequestSerializer.serializer;
+                }
+                gSessionManagers[key] = manager;
+            } else {
+                return nil;
+            }
+        }
     }
 
 #if !TARGET_OS_WATCH
