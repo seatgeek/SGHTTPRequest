@@ -121,80 +121,105 @@ void doOnMain(void(^block)()) {
         NSLog(@"%@", self.url);
     }
 
-    AFHTTPSessionManager *manager = [self.class managerForBaseURL:baseURL
-          requestType:self.requestFormat responseType:self.responseFormat];
+    AFHTTPSessionManager *manager = [self.class managerForBaseURL:baseURL];
 
     if (!manager) {
         [self failedWithError:nil task:nil retryURL:baseURL];
         return;
     }
 
-    for (NSString *field in self.requestHeaders) {
-        [manager.requestSerializer setValue:self.requestHeaders[field] forHTTPHeaderField:field];
-    }
-
     [self removeCacheFilesIfExpired];
 
-    if (self.eTag.length && ![self.eTag isEqualToString:@"Missing"]) {
-        [manager.requestSerializer setValue:self.eTag forHTTPHeaderField:@"If-None-Match"];
-
-        // The iOS URL loading system by default does local caching. If it receives a 304 back,
-        // it brings in the most previously cached body for that URL, updates our status code to 200,
-        // but seems to keep the other headers from the 304. Unfortunately this means that we get our
-        // current eTag back in the headers with the most recent 200 response body, if that previous
-        // response lacked an eTag and was not related. So we need to turn off the iOS URL loading system
-        // local caching when we are doing our own eTag caching. That way our eTag caching code in -success:
-        // can get our 304 responses back undoctored. Local caching will be taken care of by our code.
-        manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-    } else {
-        [manager.requestSerializer setValue:nil forHTTPHeaderField:@"If-None-Match"];
-        manager.requestSerializer.cachePolicy = NSURLRequestUseProtocolCachePolicy;
-    }
-
-    id success = ^(NSURLSessionTask *task, id responseObject) {
-        [self success:task responseObject:responseObject];
-    };
-    id failure = ^(NSURLSessionTask *task, NSError *error) {
-        if (((NSHTTPURLResponse*)task.response).statusCode == 304) { // not modified
-            [self success:task responseObject:nil];
-        } else {
-            [self failedWithError:error task:task retryURL:baseURL];
+    @synchronized(manager) {
+        switch (self.responseFormat) {
+            case SGHTTPDataTypeHTTP:
+                manager.responseSerializer = AFHTTPResponseSerializer.serializer;
+                break;
+            case SGHTTPDataTypeXML:
+                manager.responseSerializer = AFXMLParserResponseSerializer.serializer;
+                break;
+            default:
+                manager.responseSerializer = AFJSONResponseSerializer.serializer;
+                break;
         }
-    };
+        switch (self.requestFormat) {
+            case SGHTTPDataTypeXML:
+                manager.requestSerializer = AFHTTPRequestSerializer.serializer;
+                [manager.requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Content-Type"];
+                break;
+            case SGHTTPDataTypeJSON:
+                manager.requestSerializer = AFJSONRequestSerializer.serializer;
+                break;
+            default:
+                manager.requestSerializer = AFHTTPRequestSerializer.serializer;
+                break;
+        }
 
-    switch (self.method) {
-        case SGHTTPRequestMethodGet:
-            _sessionTask = [manager GET:self.url.absoluteString parameters:self.parameters
-                                    progress:nil success:success failure:failure];
-            break;
-        case SGHTTPRequestMethodPost:
-            _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
-                                    progress:nil success:success failure:failure];
-            break;
-        case SGHTTPRequestMethodMultipartPost:
-            {
-            __weak SGHTTPRequest *me = self;
-            _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
-               constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
-                   [formData appendPartWithFileData:me.multiPartData
-                                               name:me.multiPartName
-                                           fileName:me.multiPartFilename
-                                           mimeType:me.multiPartMimeType];
-               } progress:nil success:success failure:failure];
-             }
-            break;
-        case SGHTTPRequestMethodDelete:
-            _sessionTask = [manager DELETE:self.url.absoluteString
-                                    parameters:self.parameters success:success failure:failure];
-            break;
-        case SGHTTPRequestMethodPut:
-            _sessionTask = [manager PUT:self.url.absoluteString
-                                    parameters:self.parameters success:success failure:failure];
-            break;
-        case SGHTTPRequestMethodPatch:
-            _sessionTask = [manager PATCH:self.url.absoluteString
-                                    parameters:self.parameters success:success failure:failure];
-            break;
+        for (NSString *field in self.requestHeaders) {
+            [manager.requestSerializer setValue:self.requestHeaders[field] forHTTPHeaderField:field];
+        }
+
+        if (self.eTag.length && ![self.eTag isEqualToString:@"Missing"]) {
+            [manager.requestSerializer setValue:self.eTag forHTTPHeaderField:@"If-None-Match"];
+
+            // The iOS URL loading system by default does local caching. If it receives a 304 back,
+            // it brings in the most previously cached body for that URL, updates our status code to 200,
+            // but seems to keep the other headers from the 304. Unfortunately this means that we get our
+            // current eTag back in the headers with the most recent 200 response body, if that previous
+            // response lacked an eTag and was not related. So we need to turn off the iOS URL loading system
+            // local caching when we are doing our own eTag caching. That way our eTag caching code in -success:
+            // can get our 304 responses back undoctored. Local caching will be taken care of by our code.
+            manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+        } else {
+            [manager.requestSerializer setValue:nil forHTTPHeaderField:@"If-None-Match"];
+            manager.requestSerializer.cachePolicy = NSURLRequestUseProtocolCachePolicy;
+        }
+
+        id success = ^(NSURLSessionTask *task, id responseObject) {
+            [self success:task responseObject:responseObject];
+        };
+        id failure = ^(NSURLSessionTask *task, NSError *error) {
+            if (((NSHTTPURLResponse*)task.response).statusCode == 304) { // not modified
+                [self success:task responseObject:nil];
+            } else {
+                [self failedWithError:error task:task retryURL:baseURL];
+            }
+        };
+
+        switch (self.method) {
+            case SGHTTPRequestMethodGet:
+                _sessionTask = [manager GET:self.url.absoluteString parameters:self.parameters
+                                        progress:nil success:success failure:failure];
+                break;
+            case SGHTTPRequestMethodPost:
+                _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
+                                        progress:nil success:success failure:failure];
+                break;
+            case SGHTTPRequestMethodMultipartPost:
+                {
+                __weak SGHTTPRequest *me = self;
+                _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
+                   constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+                       [formData appendPartWithFileData:me.multiPartData
+                                                   name:me.multiPartName
+                                               fileName:me.multiPartFilename
+                                               mimeType:me.multiPartMimeType];
+                   } progress:nil success:success failure:failure];
+                 }
+                break;
+            case SGHTTPRequestMethodDelete:
+                _sessionTask = [manager DELETE:self.url.absoluteString
+                                        parameters:self.parameters success:success failure:failure];
+                break;
+            case SGHTTPRequestMethodPut:
+                _sessionTask = [manager PUT:self.url.absoluteString
+                                        parameters:self.parameters success:success failure:failure];
+                break;
+            case SGHTTPRequestMethodPatch:
+                _sessionTask = [manager PATCH:self.url.absoluteString
+                                        parameters:self.parameters success:success failure:failure];
+                break;
+        }
     }
 
     __weak typeof(self) me = self;
@@ -255,54 +280,27 @@ void doOnMain(void(^block)()) {
     return self;
 }
 
-+ (AFHTTPSessionManager *)managerForBaseURL:(NSString *)baseURL
-                                requestType:(SGHTTPDataType)requestType
-                               responseType:(SGHTTPDataType)responseType {
++ (AFHTTPSessionManager *)managerForBaseURL:(NSString *)baseURL {
     static dispatch_once_t token = 0;
     dispatch_once(&token, ^{
         gSessionManagers = NSMutableDictionary.new;
         gReachabilityManagers = NSMutableDictionary.new;
     });
 
-    id key = [NSString stringWithFormat:@"%@+%@+%@",
-                                        @(requestType),
-                                        @(responseType),
-                                        baseURL];
-
     AFHTTPSessionManager *manager;
     NSURL *url = [NSURL URLWithString:baseURL];
 
     @synchronized(self) {
-        manager = gSessionManagers[key];
+        manager = gSessionManagers[baseURL];
         if (!manager) {
             manager = [[AFHTTPSessionManager alloc] initWithBaseURL:url];
             if (manager) {
-                gSessionManagers[key] = manager;
+                gSessionManagers[baseURL] = manager;
             } else {
                 return nil;
             }
         }
-    }
-
-    if (responseType == SGHTTPDataTypeHTTP) {
-        manager.responseSerializer = AFHTTPResponseSerializer.serializer;
-    } else if (responseType == SGHTTPDataTypeXML) {
-        manager.responseSerializer = AFXMLParserResponseSerializer.serializer;
-    } else {
-        manager.responseSerializer = AFJSONResponseSerializer.serializer;  // the default
-    }
-
-    if (requestType == SGHTTPDataTypeXML) {
-        AFHTTPRequestSerializer *requestSerializer = manager.requestSerializer;
-        [requestSerializer setValue:@"application/xml" forHTTPHeaderField:@"Content-Type"];
-    } else if (requestType == SGHTTPDataTypeJSON) {
-        manager.requestSerializer = AFJSONRequestSerializer.serializer;
-    } else {
-        manager.requestSerializer = AFHTTPRequestSerializer.serializer;  // the default
-    }
-
 #if !TARGET_OS_WATCH
-    @synchronized(self) {
         if (url.host.length && !gReachabilityManagers[url.host]) {
             AFNetworkReachabilityManager *reacher = [AFNetworkReachabilityManager managerForDomain:url
                   .host];
@@ -323,8 +321,8 @@ void doOnMain(void(^block)()) {
                 [reacher startMonitoring];
             }
         }
-    }
 #endif
+    }
 
     return manager;
 }
