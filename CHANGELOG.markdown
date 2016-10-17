@@ -1,3 +1,7 @@
+## 1.8.3
+
+- Fix a crash caused be a race condition involving potential reuse of AFHTTPSessionManagers and SecTrustRefs
+
 ## 1.8.2
 
 - The main SHTTPRequest pod now works happily in today extensions (no need for setting any macros in project settings)
