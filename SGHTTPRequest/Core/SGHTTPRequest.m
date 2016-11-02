@@ -165,7 +165,7 @@ void doOnMain(void(^block)()) {
         }
 
         id success = ^(NSURLSessionTask *task, id responseObject) {
-            NSString *contentType = ((NSHTTPURLResponse*)task.response).allHeaderFields[@"Content-Type"];
+            NSString *contentType = ((NSHTTPURLResponse*)task.response).MIMEType;
             NSString *errorUserInfoReason;
             switch (self.responseFormat) {
                 case SGHTTPDataTypeJSON:
