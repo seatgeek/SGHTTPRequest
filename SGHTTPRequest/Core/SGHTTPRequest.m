@@ -131,17 +131,6 @@ void doOnMain(void(^block)()) {
     [self removeCacheFilesIfExpired];
 
     @synchronized(manager) {
-        switch (self.responseFormat) {
-            case SGHTTPDataTypeHTTP:
-                manager.responseSerializer = AFHTTPResponseSerializer.serializer;
-                break;
-            case SGHTTPDataTypeXML:
-                manager.responseSerializer = AFXMLParserResponseSerializer.serializer;
-                break;
-            default:
-                manager.responseSerializer = AFJSONResponseSerializer.serializer;
-                break;
-        }
         switch (self.requestFormat) {
             case SGHTTPDataTypeXML:
                 manager.requestSerializer = AFHTTPRequestSerializer.serializer;
@@ -176,7 +165,35 @@ void doOnMain(void(^block)()) {
         }
 
         id success = ^(NSURLSessionTask *task, id responseObject) {
-            [self success:task responseObject:responseObject];
+            NSString *contentType = ((NSHTTPURLResponse*)task.response).allHeaderFields[@"Content-Type"];
+            NSString *errorUserInfoReason;
+            switch (self.responseFormat) {
+                case SGHTTPDataTypeJSON:
+                    if (![AFJSONResponseSerializer.serializer.acceptableContentTypes containsObject:contentType]) {
+                        errorUserInfoReason = [NSString stringWithFormat:@"Expected SGHTTPDataTypeJSON but received %@.", contentType];
+                    }
+                    break;
+                case SGHTTPDataTypeXML:
+                    if (![AFXMLParserResponseSerializer.serializer.acceptableContentTypes containsObject:contentType]) {
+                        errorUserInfoReason = [NSString stringWithFormat:@"Expected SGHTTPDataTypeXML but received %@.", contentType];
+                    }
+                    break;
+                default:  // SGHTTPDataTypeHTTP
+                    break;
+            }
+            if (errorUserInfoReason) {
+                NSDictionary *userInfo = @{
+                    NSLocalizedDescriptionKey: NSLocalizedString(@"Unexpected Content-Type", nil),
+                    NSLocalizedFailureReasonErrorKey: NSLocalizedString(errorUserInfoReason, nil),
+                    NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString(@"Ensure the client is requesting the Content-Type sent by the server.", nil)
+                };
+                NSError *error = [NSError errorWithDomain:AFURLResponseSerializationErrorDomain  // the same domain/code used by AFNetworking
+                                                     code:NSURLErrorCannotDecodeContentData
+                                                 userInfo:userInfo];
+                [self failedWithError:error task:task retryURL:baseURL];
+            } else {
+                [self success:task responseObject:responseObject];
+            }
         };
         id failure = ^(NSURLSessionTask *task, NSError *error) {
             if (((NSHTTPURLResponse*)task.response).statusCode == 304) { // not modified
@@ -295,6 +312,10 @@ void doOnMain(void(^block)()) {
         if (!manager) {
             manager = [[AFHTTPSessionManager alloc] initWithBaseURL:url];
             if (manager) {
+                NSArray *responseSerializers = @[AFJSONResponseSerializer.serializer,
+                                                 AFXMLParserResponseSerializer.serializer,
+                                                 AFHTTPResponseSerializer.serializer];
+                manager.responseSerializer = [AFCompoundResponseSerializer compoundSerializerWithResponseSerializers:responseSerializers];
                 gSessionManagers[baseURL] = manager;
             } else {
                 return nil;
