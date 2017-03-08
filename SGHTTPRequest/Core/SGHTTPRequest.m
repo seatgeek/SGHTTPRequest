@@ -167,19 +167,34 @@ void doOnMain(void(^block)()) {
         id success = ^(NSURLSessionTask *task, id responseObject) {
             NSString *contentType = ((NSHTTPURLResponse*)task.response).MIMEType;
             NSString *errorUserInfoReason;
-            switch (self.responseFormat) {
-                case SGHTTPDataTypeJSON:
-                    if (![AFJSONResponseSerializer.serializer.acceptableContentTypes containsObject:contentType]) {
-                        errorUserInfoReason = [NSString stringWithFormat:@"Expected SGHTTPDataTypeJSON but received %@.", contentType];
-                    }
+
+            BOOL noContent;
+            switch (((NSHTTPURLResponse*)task.response).statusCode) {
+                case 204:
+                case 205:
+                    noContent = YES;
                     break;
-                case SGHTTPDataTypeXML:
-                    if (![AFXMLParserResponseSerializer.serializer.acceptableContentTypes containsObject:contentType]) {
-                        errorUserInfoReason = [NSString stringWithFormat:@"Expected SGHTTPDataTypeXML but received %@.", contentType];
-                    }
-                    break;
-                default:  // SGHTTPDataTypeHTTP
-                    break;
+                default:
+                    noContent = NO;
+            }            
+            if (noContent) {
+                responseObject = nil;   // AFNetworking returns a silly 
+            } else {
+                // check that we got the correct content type.
+                switch (self.responseFormat) {
+                    case SGHTTPDataTypeJSON:
+                        if (![AFJSONResponseSerializer.serializer.acceptableContentTypes containsObject:contentType]) {
+                            errorUserInfoReason = [NSString stringWithFormat:@"Expected SGHTTPDataTypeJSON but received %@.", contentType];
+                        }
+                        break;
+                    case SGHTTPDataTypeXML:
+                        if (![AFXMLParserResponseSerializer.serializer.acceptableContentTypes containsObject:contentType]) {
+                            errorUserInfoReason = [NSString stringWithFormat:@"Expected SGHTTPDataTypeXML but received %@.", contentType];
+                        }
+                        break;
+                    default:  // SGHTTPDataTypeHTTP, anything goes
+                        break;
+                }
             }
             if (errorUserInfoReason) {
                 NSDictionary *userInfo = @{
