@@ -37,7 +37,9 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(turnOffIndicator)
           object:nil];
 
-    [self.sharedApplication setNetworkActivityIndicatorVisible:YES];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.sharedApplication setNetworkActivityIndicatorVisible:YES];
+    });
 
     _indicatorVisible = YES;
 }
@@ -46,7 +48,9 @@
     if (!_indicatorVisible) {
         return;
     }
-    [self.sharedApplication setNetworkActivityIndicatorVisible:NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.sharedApplication setNetworkActivityIndicatorVisible:NO];
+    });
     _indicatorVisible = NO;
 }
 
