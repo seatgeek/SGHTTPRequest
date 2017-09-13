@@ -7,7 +7,8 @@ Pod::Spec.new do |s|
   s.author        = "SeatGeek"    
   s.source        = { :git => "https://github.com/seatgeek/SGHTTPRequest.git", :tag => "1.8.3" }
   s.requires_arc  = true
-  s.dependency    "AFNetworking", '~>3.0'
+  s.dependency    "AFNetworking/NSURLSession", '~>3.0'
+  s.dependency    "AFNetworking/Reachability", '~>3.0'
   s.dependency    "MGEvents", '~> 1.1'
   s.default_subspecs = 'Core', 'UIKit'
   s.ios.deployment_target = '7.0'

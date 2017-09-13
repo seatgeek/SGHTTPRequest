@@ -11,7 +11,8 @@
 #endif
 
 #import "SGHTTPRequest.h"
-#import <AFNetworking/AFNetworking.h>
+#import <AFNetworking/AFURLResponseSerialization.h>
+#import <AFNetworking/AFHTTPSessionManager.h>
 #ifdef SG_INCLUDE_UIKIT
 #import "SGActivityIndicator.h"
 #endif
