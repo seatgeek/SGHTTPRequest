@@ -46,7 +46,7 @@ SGHTTPLogging gLogging = SGHTTPLogNothing;
 @property (nonatomic, strong) NSString *multiPartMimeType;
 @end
 
-void doOnMain(void(^block)()) {
+void doOnMain(void(^block)(void)) {
     if (NSThread.isMainThread) { // we're on the main thread. yay
         block();
     } else { // we're off the main thread. Bump off.

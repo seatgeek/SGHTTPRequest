@@ -13,7 +13,7 @@
 @class SGHTTPRequest;
 
 typedef void (^SGHTTPResponseBlock)(SGHTTPRequest *req);
-typedef void (^SGHTTPRetryBlock)();
+typedef void (^SGHTTPRetryBlock)(void);
 typedef void (^SGHTTPProgressBlock)(double progress);
 
 typedef NS_OPTIONS(NSInteger, SGHTTPRequestMethod) {
