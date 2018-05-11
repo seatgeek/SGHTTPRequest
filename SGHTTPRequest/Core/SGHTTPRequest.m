@@ -286,7 +286,7 @@ void doOnMain(void(^block)(void)) {
            [SGHTTPRequest removeRetryCompletion:self.onNetworkReachable forHost:self.url.host];
             self.onNetworkReachable = nil;
         }
-        [_sessionTask cancel]; // will call the failure block
+        [self->_sessionTask cancel]; // will call the failure block
     });
 }
 

@@ -11,15 +11,15 @@ Pod::Spec.new do |s|
   s.dependency    "AFNetworking/Reachability", '~>3.0'
   s.dependency    "MGEvents", '~> 1.1'
   s.default_subspecs = 'Core', 'UIKit'
-  s.ios.deployment_target = '7.0'
+  s.ios.deployment_target = '9.0'
   s.subspec 'Core' do |sp|
-    sp.ios.deployment_target = '7.0'
+    sp.ios.deployment_target = '9.0'
     sp.watchos.deployment_target = '2.0'
     sp.source_files = 'SGHTTPRequest/Core/**/*.{h,m}'    
   end
 
   s.subspec 'UIKit' do |sp|    
-    sp.ios.deployment_target = '7.0'
+    sp.ios.deployment_target = '9.0'
     sp.xcconfig = { "GCC_PREPROCESSOR_DEFINITIONS" => '$(inherited) SG_INCLUDE_UIKIT=1' }
     sp.dependency 'SGHTTPRequest/Core'    
     sp.source_files = 'SGHTTPRequest/UI/**/*.{h,m}'
