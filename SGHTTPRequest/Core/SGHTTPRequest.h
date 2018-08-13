@@ -7,8 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <SGHTTPRequest/SGJSONSerialization.h>
-#import <SGHTTPRequest/SGFileCache.h>
+#import "SGJSONSerialization.h"
+#import "SGFileCache.h"
 
 @class SGHTTPRequest;
 
