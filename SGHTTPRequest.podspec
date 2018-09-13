@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name          = "SGHTTPRequest"
-  s.version       = "1.8.3"
+  s.version       = "1.9.0"
   s.summary       = "A lightweight AFNetworking wrapper for making HTTP requests with minimal code, and callback blocks for success, failure, and retry."
   s.homepage      = "https://github.com/seatgeek/SGHTTPRequest"
   s.license       = { :type => "BSD", :file => "LICENSE" }
   s.author        = "SeatGeek"    
-  s.source        = { :git => "https://github.com/seatgeek/SGHTTPRequest.git", :tag => "1.8.3" }
+  s.source        = { :git => "https://github.com/seatgeek/SGHTTPRequest.git", :tag => "1.9.0" }
   s.requires_arc  = true
   s.dependency    "AFNetworking/NSURLSession", '~>3.0'
   s.dependency    "AFNetworking/Reachability", '~>3.0'
