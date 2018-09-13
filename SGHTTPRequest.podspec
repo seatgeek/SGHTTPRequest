@@ -8,18 +8,12 @@ Pod::Spec.new do |s|
   s.source        = { :git => "https://github.com/seatgeek/SGHTTPRequest.git", :tag => "1.9.0" }
   s.requires_arc  = true
   s.dependency    "AFNetworking/NSURLSession", '~>3.0'
-  
+  s.dependency    "AFNetworking/Reachability", '~>3.0'
   s.dependency    "MGEvents", '~> 1.1'
   s.default_subspecs = 'Core', 'UIKit'
   s.ios.deployment_target = '9.0'
   s.subspec 'Core' do |sp|
-    sp.ios.deployment_target = '9.0'
-    sp.dependency    "AFNetworking/Reachability", '~>3.0'  
-    sp.source_files = 'SGHTTPRequest/Core/**/*.{h,m}'    
-  end
-
-  s.subspec 'WatchOS' do |sp|    
-    sp.watchos.deployment_target = '2.0'    
+    sp.ios.deployment_target = '9.0'    
     sp.source_files = 'SGHTTPRequest/Core/**/*.{h,m}'    
   end
 
