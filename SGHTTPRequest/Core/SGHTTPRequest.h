@@ -12,7 +12,7 @@
 
 @class SGHTTPRequest;
 
-typedef void (^SGHTTPResponseBlock)(SGHTTPRequest *req);
+typedef void (^SGHTTPResponseBlock)(SGHTTPRequest * _Nonnull req);
 typedef void (^SGHTTPRetryBlock)(void);
 typedef void (^SGHTTPProgressBlock)(double progress);
 
@@ -50,54 +50,54 @@ typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
 /**
 * Returns a new GET request instance for the given URL.
 */
-+ (instancetype)requestWithURL:(NSURL *)url;
++ (nonnull instancetype)requestWithURL:(nonnull NSURL *)url;
 
 /**
 * Returns a new POST request instance for the given URL.
 */
-+ (instancetype)postRequestWithURL:(NSURL *)url;
++ (nonnull instancetype)postRequestWithURL:(nonnull NSURL *)url;
 
 /**
 * Returns a new POST request instance for the given URL, configured to send the
 * POST <parameters> as a JSON string.
 */
-+ (instancetype)jsonPostRequestWithURL:(NSURL *)url;
++ (nonnull instancetype)jsonPostRequestWithURL:(nonnull NSURL *)url;
 
 /**
 * Returns a new DELETE request instance for the given URL.
 */
-+ (instancetype)deleteRequestWithURL:(NSURL *)url;
++ (nonnull instancetype)deleteRequestWithURL:(nonnull NSURL *)url;
 
 /**
 * Returns a new PUT request instance for the given URL.
 */
-+ (instancetype)putRequestWithURL:(NSURL *)url;
++ (nonnull instancetype)putRequestWithURL:(nonnull NSURL *)url;
 
 /**
 * Returns a new PATCH request instance for the given URL.
 */
-+ (instancetype)patchRequestWithURL:(NSURL *)url;
++ (nonnull instancetype)patchRequestWithURL:(nonnull NSURL *)url;
 
 /**
  * Returns a new multipart POST request instance for the given URL and parameters
  */
-+ (instancetype)multiPartPostRequestWithURL:(NSURL *)url
-                                       data:(NSData *)data
-                                       name:(NSString *)name
-                                   filename:(NSString *)filename
-                                   mimeType:(NSString *)mimeType;
++ (nonnull instancetype)multiPartPostRequestWithURL:(nonnull NSURL *)url
+                                               data:(nonnull NSData *)data
+                                               name:(nonnull NSString *)name
+                                           filename:(nonnull NSString *)filename
+                                           mimeType:(nonnull NSString *)mimeType;
 
 /**
 * Returns a new POST request instance for the given URL, configured to send the
 * POST <parameters> as an XML string.
 */
-+ (instancetype)xmlPostRequestWithURL:(NSURL *)url;
++ (nonnull instancetype)xmlPostRequestWithURL:(nonnull NSURL *)url;
 
 /**
 * Returns a new GET request instance for the given URL, configured to parse the
 * response data as XML.
 */
-+ (instancetype)xmlRequestWithURL:(NSURL *)url;
++ (nonnull instancetype)xmlRequestWithURL:(nonnull NSURL *)url;
 
 #pragma mark Starting and Stopping
 
@@ -114,13 +114,13 @@ typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
 * Called after request success. You can access the request's final <responseData>,
 * <responseString>, and <statusCode> values in this block.
 */
-@property (nonatomic, copy) SGHTTPResponseBlock onSuccess;
+@property (nullable, nonatomic, copy) SGHTTPResponseBlock onSuccess;
 
 /**
 * Called after request failure. You can access the request's final <responseData>,
 * <responseString>, <statusCode>, and <error> values in this block.
 */
-@property (nonatomic, copy) SGHTTPResponseBlock onFailure;
+@property (nullable, nonatomic, copy) SGHTTPResponseBlock onFailure;
 
 /**
  * Called as request upload progresses. Client code that needs to update a progress
@@ -128,14 +128,14 @@ typedef NS_OPTIONS(NSInteger, SGHTTPLogging) {
  *
  * NOTE: May be called on background thread.
  */
-@property (nonatomic, copy) SGHTTPProgressBlock onUploadProgress;
+@property (nullable, nonatomic, copy) SGHTTPProgressBlock onUploadProgress;
 
 /**
  * Called as reponse download progresses.
  *
  * NOTE: May be called on background thread.
  */
-@property (nonatomic, copy) SGHTTPProgressBlock onDownloadProgress;
+@property (nullable, nonatomic, copy) SGHTTPProgressBlock onDownloadProgress;
 
 /**
 Called when a failed request's network resource becomes available again. This
@@ -162,7 +162,7 @@ a new identical request.
         [req start];
     }
 */
-@property (nonatomic, copy) SGHTTPRetryBlock onNetworkReachable;
+@property (nullable, nonatomic, copy) SGHTTPRetryBlock onNetworkReachable;
 
 #pragma mark Response data and errors
 
@@ -171,22 +171,22 @@ a new identical request.
 /**
 * The raw response data for both successful and failed requests.
 */
-- (NSData *)responseData;
+- (nullable NSData *)responseData;
 
 /**
 * The response string for both successful and failed requests.
 */
-- (NSString *)responseString;
+- (nullable NSString *)responseString;
 
 /**
 * An NSDictionary or NSArray, assuming the response data is JSON.
 */
-- (id)responseJSON;
+- (nullable id)responseJSON;
 
 /**
  * An NSDictionary containing the response headers.
  */
-- (NSDictionary *)responseHeaders;
+- (nullable NSDictionary *)responseHeaders;
 
 /**
 * The HTTP status code for both successful and failed requests.
@@ -196,7 +196,7 @@ a new identical request.
 /**
 * An error object available on failed requests.
 */
-- (NSError *)error;
+- (nullable NSError *)error;
 
 #pragma mark Settings and Options
 
@@ -205,17 +205,17 @@ a new identical request.
 /**
 * The URL of the HTTP request
 */
-@property (nonatomic, strong) NSURL *url;
+@property (nonnull, nonatomic, strong) NSURL *url;
 
 /**
 * A dictionary of POST fields and values to send with the request.
 */
-@property (nonatomic, strong) NSDictionary *parameters;
+@property (nullable, nonatomic, strong) NSDictionary *parameters;
 
 /**
  * An optional dictionary of HTTP header fields and values to send with the request.
  */
-@property (nonatomic, strong) NSDictionary *requestHeaders;
+@property (nullable, nonatomic, strong) NSDictionary *requestHeaders;
 
 /**
 * Whether to show the status bar network activity indicator or not. Default is YES.
@@ -240,7 +240,7 @@ a new identical request.
 /**
  * Extracts the base URL from a given URL
  */
-+ (NSString *)baseURLFrom:(NSURL *)url;
++ (nonnull NSString *)baseURLFrom:(nonnull NSURL *)url;
 
 #pragma mark Null handling
 /** @name Null handling */
@@ -334,17 +334,17 @@ a new identical request.
  * If `allowCacheToDisk` is YES, then the response data will be cached
  * to disk and keyed by it's ETag.
  */
-@property (nonatomic, strong) NSString *eTag;
+@property (nullable, nonatomic, strong) NSString *eTag;
 
 /**
  * The cached raw response data for the current eTag. nil if no cached data.
  */
-- (NSData *)cachedResponseData;
+- (nullable NSData *)cachedResponseData;
 
 /**
  * The cached response JSON. nil if no cached data.
  */
-- (id)cachedResponseJSON;
+- (nullable id)cachedResponseJSON;
 
 /**
  * Remove any cached response JSON for this request if it exists.
