@@ -376,7 +376,8 @@ void doOnMain(void(^block)(void)) {
     NSData *responseData = nil;
     NSString *responseString = nil;
 
-    if ([responseObject isKindOfClass:NSDictionary.class]) {
+    if ([responseObject isKindOfClass:NSDictionary.class]
+        || [responseObject isKindOfClass:NSArray.class]) {
         responseData = [NSJSONSerialization dataWithJSONObject:responseObject
                                                            options:NSJSONWritingPrettyPrinted
                                                              error:nil];
