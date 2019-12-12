@@ -145,8 +145,12 @@ void doOnMain(void(^block)(void)) {
                 break;
         }
 
-        for (NSString *field in self.requestHeaders) {
-            [manager.requestSerializer setValue:self.requestHeaders[field] forHTTPHeaderField:field];
+        NSMutableDictionary *combinedHeaders = @{}.mutableCopy;
+        [combinedHeaders addEntriesFromDictionary: SGHTTPRequest.globalRequestHeaders];
+        [combinedHeaders addEntriesFromDictionary: self.requestHeaders];
+
+        for (NSString *field in combinedHeaders) {
+            [manager.requestSerializer setValue:combinedHeaders[field] forHTTPHeaderField:field];
         }
 
         if (self.eTag.length && ![self.eTag isEqualToString:@"Missing"]) {
@@ -681,6 +685,18 @@ static BOOL gAllowNSNulls = YES;
     return gAllowNSNulls;
 }
 
+#pragma mark - Global Request Headers
+
+static NSDictionary *gGlobalRequestHeaders = nil;
+
++ (void)setGlobalRequestHeaders:(NSDictionary *)globalRequestHeaders {
+    gGlobalRequestHeaders = globalRequestHeaders;
+}
+
++ (NSDictionary *)globalRequestHeaders {
+    return gGlobalRequestHeaders;
+}
+
 #pragma mark - Logging
 
 + (void)setLogging:(SGHTTPLogging)logging {
@@ -758,6 +774,7 @@ static BOOL gAllowNSNulls = YES;
     [output appendString:[NSString stringWithFormat:@"%@", self.url]];
     [output appendString:[self boxUpString:@"Request Headers:" fatLine:NO]];
     [output appendString:[NSString stringWithFormat:@"%@", self.requestHeaders]];
+    [output appendString:[NSString stringWithFormat:@"%@", SGHTTPRequest.globalRequestHeaders]];
 
     // this prints out POST Data: / PUT data: etc
     [output appendString:[self boxUpString:[NSString stringWithFormat:@"%@ Data:", requestMethod]

@@ -218,6 +218,16 @@ a new identical request.
 @property (nullable, nonatomic, strong) NSDictionary *requestHeaders;
 
 /**
+ * Set the HTTP header fields and values to send with every request.
+ */
++ (void)setGlobalRequestHeaders:(nullable NSDictionary *)globalRequestHeaders;
+
+/**
+* An optional dictionary of HTTP header fields and values to send with every request.
+*/
++ (nullable NSDictionary *)globalRequestHeaders;
+
+/**
 * Whether to show the status bar network activity indicator or not. Default is YES.
 */
 @property (nonatomic, assign) BOOL showActivityIndicator;
