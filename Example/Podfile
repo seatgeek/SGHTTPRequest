@@ -1,5 +1,8 @@
 source 'https://github.com/CocoaPods/Specs.git'
+source 'git@gitlab.service.seatgeek.mgmt:dev/podspec.git'
+platform :ios, '9.0'
+inhibit_all_warnings!
 
-target 'SGHTTPRequestTests', :exclusive => true do
+target 'SGHTTPRequestTests' do
   pod 'SGHTTPRequest', :path => '../'
 end

@@ -19,7 +19,7 @@
 #import "SGHTTPRequestDebug.h"
 #import "NSString+SGHTTPRequest.h"
 #import <SGHTTPRequest/SGFileCache.h>
-#import "MGEvents.h"
+@import SGObjectEvents;
 
 #define SGETag              @"eTag"
 
@@ -263,14 +263,16 @@ void doOnMain(void(^block)(void)) {
     if (self.onUploadProgress) {
         NSProgress *progress = [manager uploadProgressForTask:_sessionTask];
         __weak NSProgress *wProgress = progress;
-        [progress onChangeOf:@"fractionCompleted" do:^{
+        [progress onChangeOfKeyPath:@"fractionCompleted"
+                                 do:^{
             me.onUploadProgress(wProgress.fractionCompleted);
         }];
     }
     if (self.onDownloadProgress) {
         NSProgress *progress = [manager downloadProgressForTask:_sessionTask];
         __weak NSProgress *wProgress = progress;
-        [progress onChangeOf:@"fractionCompleted" do:^{
+        [progress onChangeOfKeyPath:@"fractionCompleted"
+                                 do:^{
             me.onDownloadProgress(wProgress.fractionCompleted);
         }];
     }

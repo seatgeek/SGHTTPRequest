@@ -1,1 +1,1 @@
-../../../../../SGHTTPRequest/JSONSerialization/SGJSONSerialization.h
+../../../../../SGHTTPRequest/Core/JSONSerialization/SGJSONSerialization.h

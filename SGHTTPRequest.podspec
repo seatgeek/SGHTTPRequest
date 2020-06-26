@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.requires_arc  = true
   s.dependency    "AFNetworking/NSURLSession", '~>3.0'
   s.dependency    "AFNetworking/Reachability", '~>3.0'
-  s.dependency    "MGEvents", '~> 1.1'
+  s.dependency    "SGObjectEvents/Core"
   s.default_subspecs = 'Core', 'UIKit'
   s.ios.deployment_target = '9.0'
   s.subspec 'Core' do |sp|

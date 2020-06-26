@@ -1,0 +1,6 @@
+module SGObjectEvents {
+  umbrella header "SGObjectEvents-umbrella.h"
+
+  export *
+  module * { export * }
+}

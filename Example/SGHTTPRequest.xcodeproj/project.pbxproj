@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		027EE6904BF14C5E27E351A5 /* libPods-SGHTTPRequestTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5EB3A9D069F01ACAA96CAE5 /* libPods-SGHTTPRequestTests.a */; };
 		1A0DA3AC1C6399AA000A34CB /* SGHTTPRequestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0DA3AB1C6399AA000A34CB /* SGHTTPRequestTests.m */; };
 		1A0DA3AF1C63B9D2000A34CB /* SGTestHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A0DA3AE1C63B9D2000A34CB /* SGTestHelpers.m */; };
 		1A0DA3B11C63BEDE000A34CB /* TestJSON.json in Resources */ = {isa = PBXBuildFile; fileRef = 1A0DA3B01C63BEDE000A34CB /* TestJSON.json */; };
@@ -15,16 +16,15 @@
 		6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
 		6003F5BA195388D20070C39A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6003F5B8195388D20070C39A /* InfoPlist.strings */; };
 		6003F5BC195388D20070C39A /* SGFileCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5BB195388D20070C39A /* SGFileCacheTests.m */; };
-		9D3805CAC74CCCEC9741DE5D /* libPods-SGHTTPRequestTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BC82E6A67E1248BCD7110E2F /* libPods-SGHTTPRequestTests.a */; };
+		F5F7BDD424A678E5009DE12F /* Dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F7BDD324A678E5009DE12F /* Dummy.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		183C14A2491A7BD255D05EC5 /* Pods-SGHTTPRequestTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SGHTTPRequestTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SGHTTPRequestTests/Pods-SGHTTPRequestTests.debug.xcconfig"; sourceTree = "<group>"; };
+		0D56C43F0D0864E6758DF1E9 /* Pods-SGHTTPRequestTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SGHTTPRequestTests.debug.xcconfig"; path = "Target Support Files/Pods-SGHTTPRequestTests/Pods-SGHTTPRequestTests.debug.xcconfig"; sourceTree = "<group>"; };
 		1A0DA3AB1C6399AA000A34CB /* SGHTTPRequestTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGHTTPRequestTests.m; sourceTree = "<group>"; };
 		1A0DA3AD1C63B9D2000A34CB /* SGTestHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGTestHelpers.h; sourceTree = "<group>"; };
 		1A0DA3AE1C63B9D2000A34CB /* SGTestHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGTestHelpers.m; sourceTree = "<group>"; };
 		1A0DA3B01C63BEDE000A34CB /* TestJSON.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = TestJSON.json; sourceTree = "<group>"; };
-		1E7CB0A476890EFC2DD2EE9B /* Pods-SGHTTPRequestTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SGHTTPRequestTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SGHTTPRequestTests/Pods-SGHTTPRequestTests.release.xcconfig"; sourceTree = "<group>"; };
 		27714EB5F27D00B2DC12D9B5 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		4BF5E1E218E606B6A813EB59 /* SGHTTPRequest.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = SGHTTPRequest.podspec; path = ../SGHTTPRequest.podspec; sourceTree = "<group>"; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -36,9 +36,11 @@
 		6003F5B9195388D20070C39A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6003F5BB195388D20070C39A /* SGFileCacheTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SGFileCacheTests.m; sourceTree = "<group>"; };
 		606FC2411953D9B200FFA9A0 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
-		BC82E6A67E1248BCD7110E2F /* libPods-SGHTTPRequestTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SGHTTPRequestTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E2D24AAB908A14FD0714871B /* libPods-SGHTTPRequest_Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SGHTTPRequest_Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		92C66D826F48676FFBF9742F /* Pods-SGHTTPRequestTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SGHTTPRequestTests.release.xcconfig"; path = "Target Support Files/Pods-SGHTTPRequestTests/Pods-SGHTTPRequestTests.release.xcconfig"; sourceTree = "<group>"; };
+		C5EB3A9D069F01ACAA96CAE5 /* libPods-SGHTTPRequestTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SGHTTPRequestTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E96506CE40E8E5C596AFDE39 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		F5F7BDD224A678E4009DE12F /* SGHTTPRequestTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SGHTTPRequestTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		F5F7BDD324A678E5009DE12F /* Dummy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dummy.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,7 +51,7 @@
 				6003F5B0195388D20070C39A /* XCTest.framework in Frameworks */,
 				6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */,
-				9D3805CAC74CCCEC9741DE5D /* libPods-SGHTTPRequestTests.a in Frameworks */,
+				027EE6904BF14C5E27E351A5 /* libPods-SGHTTPRequestTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,7 +65,7 @@
 				6003F5B5195388D20070C39A /* Tests */,
 				6003F58C195388D20070C39A /* Frameworks */,
 				6003F58B195388D20070C39A /* Products */,
-				8D59650947B7D6A1004BC53F /* Pods */,
+				B9A056C9C6620E0FA23EDDAC /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -82,8 +84,7 @@
 				6003F58F195388D20070C39A /* CoreGraphics.framework */,
 				6003F591195388D20070C39A /* UIKit.framework */,
 				6003F5AF195388D20070C39A /* XCTest.framework */,
-				E2D24AAB908A14FD0714871B /* libPods-SGHTTPRequest_Tests.a */,
-				BC82E6A67E1248BCD7110E2F /* libPods-SGHTTPRequestTests.a */,
+				C5EB3A9D069F01ACAA96CAE5 /* libPods-SGHTTPRequestTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -95,7 +96,9 @@
 				1A0DA3AB1C6399AA000A34CB /* SGHTTPRequestTests.m */,
 				1A0DA3AD1C63B9D2000A34CB /* SGTestHelpers.h */,
 				1A0DA3AE1C63B9D2000A34CB /* SGTestHelpers.m */,
+				F5F7BDD324A678E5009DE12F /* Dummy.swift */,
 				6003F5B6195388D20070C39A /* Supporting Files */,
+				F5F7BDD224A678E4009DE12F /* SGHTTPRequestTests-Bridging-Header.h */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -121,13 +124,13 @@
 			name = "Podspec Metadata";
 			sourceTree = "<group>";
 		};
-		8D59650947B7D6A1004BC53F /* Pods */ = {
+		B9A056C9C6620E0FA23EDDAC /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				183C14A2491A7BD255D05EC5 /* Pods-SGHTTPRequestTests.debug.xcconfig */,
-				1E7CB0A476890EFC2DD2EE9B /* Pods-SGHTTPRequestTests.release.xcconfig */,
+				0D56C43F0D0864E6758DF1E9 /* Pods-SGHTTPRequestTests.debug.xcconfig */,
+				92C66D826F48676FFBF9742F /* Pods-SGHTTPRequestTests.release.xcconfig */,
 			);
-			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -137,12 +140,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6003F5C2195388D20070C39A /* Build configuration list for PBXNativeTarget "SGHTTPRequestTests" */;
 			buildPhases = (
-				F8B5C81DBF1BD88A0B8777EB /* Check Pods Manifest.lock */,
+				41B5B823D97257ED16F87C9E /* [CP] Check Pods Manifest.lock */,
 				6003F5AA195388D20070C39A /* Sources */,
 				6003F5AB195388D20070C39A /* Frameworks */,
 				6003F5AC195388D20070C39A /* Resources */,
-				4316A38AC5E070AABEFA0481 /* Embed Pods Frameworks */,
-				478158CBB0D2C5BE3381866C /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -162,12 +163,18 @@
 				CLASSPREFIX = SG;
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "James Van-As";
+				TargetAttributes = {
+					6003F5AD195388D20070C39A = {
+						LastSwiftMigration = 1150;
+					};
+				};
 			};
 			buildConfigurationList = 6003F585195388D10070C39A /* Build configuration list for PBXProject "SGHTTPRequest" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -194,49 +201,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4316A38AC5E070AABEFA0481 /* Embed Pods Frameworks */ = {
+		41B5B823D97257ED16F87C9E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
+			inputFileListPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SGHTTPRequestTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SGHTTPRequestTests/Pods-SGHTTPRequestTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		478158CBB0D2C5BE3381866C /* Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SGHTTPRequestTests/Pods-SGHTTPRequestTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F8B5C81DBF1BD88A0B8777EB /* Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -248,6 +232,7 @@
 			files = (
 				6003F5BC195388D20070C39A /* SGFileCacheTests.m in Sources */,
 				1A0DA3AF1C63B9D2000A34CB /* SGTestHelpers.m in Sources */,
+				F5F7BDD424A678E5009DE12F /* Dummy.swift in Sources */,
 				1A0DA3AC1C6399AA000A34CB /* SGHTTPRequestTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -341,8 +326,9 @@
 		};
 		6003F5C3195388D20070C39A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 183C14A2491A7BD255D05EC5 /* Pods-SGHTTPRequestTests.debug.xcconfig */;
+			baseConfigurationReference = 0D56C43F0D0864E6758DF1E9 /* Pods-SGHTTPRequestTests.debug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -355,16 +341,21 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Tests/SGHTTPRequestTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
 		};
 		6003F5C4195388D20070C39A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1E7CB0A476890EFC2DD2EE9B /* Pods-SGHTTPRequestTests.release.xcconfig */;
+			baseConfigurationReference = 92C66D826F48676FFBF9742F /* Pods-SGHTTPRequestTests.release.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -373,8 +364,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Tests/Tests-Prefix.pch";
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Tests/SGHTTPRequestTests-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;

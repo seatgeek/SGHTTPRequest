@@ -1,5 +1,13 @@
-GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
+ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
+EMBEDDED_CONTENT_CONTAINS_SWIFT = YES
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1 $(inherited) SG_INCLUDE_UIKIT=1
 HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/AFNetworking" "${PODS_ROOT}/Headers/Public/SGHTTPRequest"
-OTHER_CFLAGS = $(inherited) -isystem "${PODS_ROOT}/Headers/Public" -isystem "${PODS_ROOT}/Headers/Public/AFNetworking" -isystem "${PODS_ROOT}/Headers/Public/SGHTTPRequest"
-OTHER_LDFLAGS = $(inherited) -ObjC -l"AFNetworking" -l"SGHTTPRequest" -framework "CoreGraphics" -framework "MobileCoreServices" -framework "Security" -framework "SystemConfiguration"
+LIBRARY_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/AFNetworking" "${PODS_CONFIGURATION_BUILD_DIR}/SGHTTPRequest" "${PODS_CONFIGURATION_BUILD_DIR}/SGObjectEvents" $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)
+OTHER_CFLAGS = $(inherited) -fmodule-map-file="${PODS_CONFIGURATION_BUILD_DIR}/SGObjectEvents/SGObjectEvents.modulemap" -isystem "${PODS_ROOT}/Headers/Public" -isystem "${PODS_ROOT}/Headers/Public/AFNetworking" -isystem "${PODS_ROOT}/Headers/Public/SGHTTPRequest"
+OTHER_LDFLAGS = $(inherited) -ObjC -l"AFNetworking" -l"SGHTTPRequest" -l"SGObjectEvents" -framework "CoreGraphics" -framework "MobileCoreServices" -framework "Security" -framework "SystemConfiguration" -framework "UIKit"
+OTHER_SWIFT_FLAGS = $(inherited) -D COCOAPODS -Xcc -fmodule-map-file="${PODS_CONFIGURATION_BUILD_DIR}/SGObjectEvents/SGObjectEvents.modulemap"
+PODS_BUILD_DIR = ${BUILD_DIR}
+PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
+PODS_PODFILE_DIR_PATH = ${SRCROOT}/.
 PODS_ROOT = ${SRCROOT}/Pods
+SWIFT_INCLUDE_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/SGObjectEvents"
