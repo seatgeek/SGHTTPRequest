@@ -12,6 +12,7 @@ Pod::Spec.new do |s|
   s.dependency    "MGEvents", '~> 1.1'
   s.default_subspecs = 'Core', 'UIKit'
   s.ios.deployment_target = '9.0'
+  s.ios.vendored_frameworks = 'SGHTTPRequest.xcframework'
   s.subspec 'Core' do |sp|
     sp.ios.deployment_target = '9.0'    
     sp.source_files = 'SGHTTPRequest/Core/**/*.{h,m}'    
