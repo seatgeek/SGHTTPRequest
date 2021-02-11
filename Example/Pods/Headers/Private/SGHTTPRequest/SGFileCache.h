@@ -1,1 +1,1 @@
-../../../../../SGHTTPRequest/Cache/SGFileCache.h
+../../../../../SGHTTPRequest/Core/Cache/SGFileCache.h

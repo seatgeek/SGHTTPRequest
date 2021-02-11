@@ -1,37 +1,51 @@
 PODS:
-  - AFNetworking (2.6.3):
-    - AFNetworking/NSURLConnection (= 2.6.3)
-    - AFNetworking/NSURLSession (= 2.6.3)
-    - AFNetworking/Reachability (= 2.6.3)
-    - AFNetworking/Security (= 2.6.3)
-    - AFNetworking/Serialization (= 2.6.3)
-    - AFNetworking/UIKit (= 2.6.3)
-  - AFNetworking/NSURLConnection (2.6.3):
+  - AFNetworking/NSURLSession (3.2.1):
     - AFNetworking/Reachability
     - AFNetworking/Security
     - AFNetworking/Serialization
-  - AFNetworking/NSURLSession (2.6.3):
-    - AFNetworking/Reachability
-    - AFNetworking/Security
-    - AFNetworking/Serialization
-  - AFNetworking/Reachability (2.6.3)
-  - AFNetworking/Security (2.6.3)
-  - AFNetworking/Serialization (2.6.3)
-  - AFNetworking/UIKit (2.6.3):
-    - AFNetworking/NSURLConnection
-    - AFNetworking/NSURLSession
-  - SGHTTPRequest (1.6.0):
-    - AFNetworking (~> 2.0)
+  - AFNetworking/Reachability (3.2.1)
+  - AFNetworking/Security (3.2.1)
+  - AFNetworking/Serialization (3.2.1)
+  - DVR (2.0.0)
+  - MGEvents (1.2.1)
+  - SGHTTPRequest (1.9.1):
+    - AFNetworking/NSURLSession (~> 3.0)
+    - AFNetworking/Reachability (~> 3.0)
+    - DVR (= 2.0.0)
+    - MGEvents (~> 1.1)
+    - SGHTTPRequest/Core (= 1.9.1)
+    - SGHTTPRequest/UIKit (= 1.9.1)
+  - SGHTTPRequest/Core (1.9.1):
+    - AFNetworking/NSURLSession (~> 3.0)
+    - AFNetworking/Reachability (~> 3.0)
+    - DVR (= 2.0.0)
+    - MGEvents (~> 1.1)
+  - SGHTTPRequest/UIKit (1.9.1):
+    - AFNetworking/NSURLSession (~> 3.0)
+    - AFNetworking/Reachability (~> 3.0)
+    - DVR (= 2.0.0)
+    - MGEvents (~> 1.1)
+    - SGHTTPRequest/Core
 
 DEPENDENCIES:
   - SGHTTPRequest (from `../`)
 
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - AFNetworking
+    - DVR
+    - MGEvents
+
 EXTERNAL SOURCES:
   SGHTTPRequest:
-    :path: ../
+    :path: "../"
 
 SPEC CHECKSUMS:
-  AFNetworking: cb8d14a848e831097108418f5d49217339d4eb60
-  SGHTTPRequest: 68bff5e7beebab64292cdfa173d93e55b6239ba7
+  AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
+  DVR: 062c287b9dc613a84120e44640176e4ef3ecf943
+  MGEvents: 989c1396082a25e760f03056bdc0af1b6c439c78
+  SGHTTPRequest: da570c47b7e0bf343b61e253b5fa8b60122ea68a
 
-COCOAPODS: 0.39.0
+PODFILE CHECKSUM: 77175c85d591c6df3160d2f035530366ff2c6a40
+
+COCOAPODS: 1.10.1

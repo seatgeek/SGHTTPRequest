@@ -7,9 +7,10 @@ Pod::Spec.new do |s|
   s.author        = "SeatGeek"    
   s.source        = { :git => "https://github.com/seatgeek/SGHTTPRequest.git", :tag => "1.9.1" }
   s.requires_arc  = true
-  s.dependency    "AFNetworking/NSURLSession", '~>3.0'
-  s.dependency    "AFNetworking/Reachability", '~>3.0'
+  s.dependency    "AFNetworking/NSURLSession", '~> 3.0'  # These two changed from '~> 3.0' to get `pod install` to succeed
+  s.dependency    "AFNetworking/Reachability", '~> 3.0'
   s.dependency    "MGEvents", '~> 1.1'
+  s.dependency    "DVR", '2.0.0'
   s.default_subspecs = 'Core', 'UIKit'
   s.ios.deployment_target = '9.0'
   s.subspec 'Core' do |sp|

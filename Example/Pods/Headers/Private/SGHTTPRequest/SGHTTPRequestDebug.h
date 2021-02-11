@@ -1,1 +1,1 @@
-../../../../../SGHTTPRequest/Debug/SGHTTPRequestDebug.h
+../../../../../SGHTTPRequest/Core/Debug/SGHTTPRequestDebug.h

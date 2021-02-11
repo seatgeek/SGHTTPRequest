@@ -1,1 +1,1 @@
-../../../../../SGHTTPRequest/Categories/NSObject+SGHTTPRequest.h
+../../../../../SGHTTPRequest/Core/Categories/NSObject+SGHTTPRequest.h

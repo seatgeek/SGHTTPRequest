@@ -1,6 +1,6 @@
 {
   "name": "SGHTTPRequest",
-  "version": "1.6.0",
+  "version": "1.9.1",
   "summary": "A lightweight AFNetworking wrapper for making HTTP requests with minimal code, and callback blocks for success, failure, and retry.",
   "homepage": "https://github.com/seatgeek/SGHTTPRequest",
   "license": {
@@ -8,18 +8,54 @@
     "file": "LICENSE"
   },
   "authors": "SeatGeek",
-  "platforms": {
-    "ios": "7.0"
-  },
   "source": {
     "git": "https://github.com/seatgeek/SGHTTPRequest.git",
-    "tag": "1.6.0"
+    "tag": "1.9.1"
   },
-  "source_files": "SGHTTPRequest/**/*.{h,m}",
   "requires_arc": true,
   "dependencies": {
-    "AFNetworking": [
-      "~>2.0"
+    "AFNetworking/NSURLSession": [
+      "~> 3.0"
+    ],
+    "AFNetworking/Reachability": [
+      "~> 3.0"
+    ],
+    "MGEvents": [
+      "~> 1.1"
+    ],
+    "DVR": [
+      "2.0.0"
     ]
-  }
+  },
+  "default_subspecs": [
+    "Core",
+    "UIKit"
+  ],
+  "platforms": {
+    "ios": "9.0"
+  },
+  "subspecs": [
+    {
+      "name": "Core",
+      "platforms": {
+        "ios": "9.0"
+      },
+      "source_files": "SGHTTPRequest/Core/**/*.{h,m}"
+    },
+    {
+      "name": "UIKit",
+      "platforms": {
+        "ios": "9.0"
+      },
+      "xcconfig": {
+        "GCC_PREPROCESSOR_DEFINITIONS": "$(inherited) SG_INCLUDE_UIKIT=1"
+      },
+      "dependencies": {
+        "SGHTTPRequest/Core": [
+
+        ]
+      },
+      "source_files": "SGHTTPRequest/UI/**/*.{h,m}"
+    }
+  ]
 }
