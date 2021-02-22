@@ -244,6 +244,11 @@ void doOnMain(void(^block)(void)) {
             [self success:nil responseObject:[self.class stubForURL:self.url]];
             return;
         }
+        
+        if (SGHTTPRequest.isRunningInTest) {
+            //current sanity check. to be removed
+            NSLog(@"WE SHOULD NOT BE GETTING HERE! FAIL");
+        }
 
         switch (self.method) {
             case SGHTTPRequestMethodGet:
