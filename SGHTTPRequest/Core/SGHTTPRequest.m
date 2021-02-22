@@ -123,8 +123,8 @@ void doOnMain(void(^block)(void)) {
 
 + (NSString *)stubForURL:(NSURL *)url {
     //switch all the URLs
-    NSLog(@"STUBBING! URL: %@", url);
-    return @{};
+    NSLog(@"STUB STUB STUB STUB STUB STUBBING! URL: %@", url);
+    return @"{}";
 }
 
 - (void)start {
