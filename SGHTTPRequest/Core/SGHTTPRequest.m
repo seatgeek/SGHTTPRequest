@@ -60,6 +60,15 @@ void doOnMain(void(^block)(void)) {
 
 #pragma mark - Public
 
++ (BOOL)isRunningInTest {
+    static BOOL isTest;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        isTest = [NSProcessInfo.processInfo.environment[@"SG_IS_TESTING"] boolValue];   // declared in the test environment var
+    });
+    return isTest;
+}
+
 + (SGHTTPRequest *)requestWithURL:(NSURL *)url {
     return [[self alloc] initWithURL:url method:SGHTTPRequestMethodGet];
 }
@@ -109,6 +118,12 @@ void doOnMain(void(^block)(void)) {
     SGHTTPRequest *request =  [[self alloc] initWithURL:url method:SGHTTPRequestMethodGet];
     request.responseFormat = SGHTTPDataTypeXML;
     return request;
+}
+
++ (NSString)stubForURL:(NSURL *)url {
+    //switch all the URLs
+    NSLog(@"STUBBING! URL: %@", url);
+    return @{}
 }
 
 - (void)start {
@@ -222,6 +237,11 @@ void doOnMain(void(^block)(void)) {
                 [self failedWithError:error task:task retryURL:baseURL];
             }
         };
+        
+        // BREAK FOR TESTING
+        if (self.isRunningInTest) {
+            [self success:nil responseObject:[stubForURL: url]];
+        }
 
         switch (self.method) {
             case SGHTTPRequestMethodGet:
