@@ -121,7 +121,7 @@ void doOnMain(void(^block)(void)) {
     return request;
 }
 
-+ (NSString)stubForURL:(NSURL *)url {
++ (NSString *)stubForURL:(NSURL *)url {
     //switch all the URLs
     NSLog(@"STUBBING! URL: %@", url);
     return @{}
@@ -240,8 +240,9 @@ void doOnMain(void(^block)(void)) {
         };
         
         // BREAK FOR TESTING
-        if (self.isRunningInTest) {
+        if (SGHTTPRequest.isRunningInTest) {
             [self success:nil responseObject:[stubForURL: url]];
+            return;
         }
 
         switch (self.method) {
