@@ -64,7 +64,8 @@ void doOnMain(void(^block)(void)) {
     static BOOL isTest;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        isTest = [NSProcessInfo.processInfo.environment[@"SG_IS_TESTING"] boolValue];   // declared in the test environment var
+        isTest = YES; // hijack for testing to test to test when testing
+        //isTest = [NSProcessInfo.processInfo.environment[@"SG_IS_TESTING"] boolValue];   // declared in the test environment var
     });
     return isTest;
 }
