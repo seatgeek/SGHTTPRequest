@@ -291,8 +291,6 @@ a new identical request.
  */
 + (SGHTTPLogging)logging;
 
-+ (NSString *)stubForURL:(NSURL *)url;
-
 #pragma mark ETag Caching
 /** @name ETag Caching */
 
