@@ -241,7 +241,7 @@ void doOnMain(void(^block)(void)) {
         
         // BREAK FOR TESTING
         if (SGHTTPRequest.isRunningInTest) {
-            [self success:nil responseObject:[SGHTTPRequest stubForURL:url]];
+            [self success:nil responseObject:SGHTTPRequest.stubForURL(url: url)];
             return;
         }
 
