@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "SGJSONSerialization.h"
 #import "SGFileCache.h"
+#import "SGNetworkStubsDataSource.h"
 
 @class SGHTTPRequest;
 
@@ -367,6 +368,10 @@ a new identical request.
  */
 - (void)removeCacheFilesIfExpired;
 
+#pragma mark Network Stubbing Data Source Injection
 
+@property (class, nonatomic, assign) id<SGNetworkStubsDataSource>_Nullable networkStubsDataSource;
 
++ (void)setNetworkStubsDataSource:(id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource;
++ (id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource;
 @end

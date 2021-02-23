@@ -19,6 +19,7 @@
 #import "SGHTTPRequestDebug.h"
 #import "NSString+SGHTTPRequest.h"
 #import <SGHTTPRequest/SGFileCache.h>
+#import "SGNetworkStubsDataSource.h"
 #import "MGEvents.h"
 
 #define SGETag              @"eTag"
@@ -827,6 +828,17 @@ static NSDictionary *gGlobalRequestHeaders = nil;
 
 - (BOOL)logResponses {
     return self.logging & SGHTTPLogResponses;
+}
+
+#pragma mark - Network Stub Data Source Injection
+static id<SGNetworkStubsDataSource>_Nullable _stubsDataSource = nil;
+
++ (void)setNetworkStubsDataSource:(id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource {
+    _stubsDataSource = networkStubsDataSource;
+}
+
++ (id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource {
+    return _stubsDataSource;
 }
 
 @end
