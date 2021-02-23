@@ -123,7 +123,7 @@ void doOnMain(void(^block)(void)) {
 
 + (NSString *)stubForURL:(NSURL *)url {
     //switch all the URLs
-    NSLog(@"STUB STUB STUB STUB STUB STUBBING! URL: %@", url);
+    NSLog(@"STUB STUB STUB STUB STUB STUBBING! FART FART URL: %@", url);
     return @"{}";
 }
 
@@ -244,14 +244,11 @@ void doOnMain(void(^block)(void)) {
             [self success:nil responseObject:[self.class stubForURL:self.url]];
             return;
         }
-        
-        if (SGHTTPRequest.isRunningInTest) {
-            //current sanity check. to be removed
-            NSLog(@"WE SHOULD NOT BE GETTING HERE! FAIL");
-        }
 
         switch (self.method) {
             case SGHTTPRequestMethodGet:
+                // This is the update signature. Should we? Let's come back...
+                //_sessionTask = [manager GET:self.url.absoluteString parameters:self.parameters headers:nil progress:nil success:success failure:failure];
                 _sessionTask = [manager GET:self.url.absoluteString parameters:self.parameters
                                         progress:nil success:success failure:failure];
                 break;
