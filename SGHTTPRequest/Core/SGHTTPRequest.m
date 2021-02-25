@@ -241,27 +241,55 @@ void doOnMain(void(^block)(void)) {
         };
         
         // BREAK FOR TESTING
-        if (SGHTTPRequest.isRunningInTest) {
-            [self success:nil responseObject:[self.class stubForURL:self.url]];
-            return;
-        }
 
+        if (SGHTTPRequest.isRunningInTest) {
+            //[self success:nil responseObject:[_stubsDataSource stubForURL:self.url record:NO]];
+            // not sure if i need the if? Just playing around rn
+            if(_stubsDataSource != nil) {
+                NSLog(@"SGHTTPRequest _stubsDataSource stubForURL: %@", [_stubsDataSource stubForURL:self.url]);
+                //[self success:nil responseObject:[_stubsDataSource stubForURL:self.url record:TRUE]];
+            }
+            //return;
+        }
+        
         switch (self.method) {
             case SGHTTPRequestMethodGet:
-                // This is the update signature. Should we? Let's come back...
-                //_sessionTask = [manager GET:self.url.absoluteString parameters:self.parameters headers:nil progress:nil success:success failure:failure];
-                _sessionTask = [manager GET:self.url.absoluteString parameters:self.parameters
-                                        progress:nil success:success failure:failure];
+                //FIXME: - Make sure these work?
+                // This is the updated signature. Should we? Let's come back...
+                _sessionTask = [manager GET:self.url.absoluteString
+                                 parameters:self.parameters
+                                    headers:nil
+                                   progress:nil
+                                    success:success
+                                    failure:failure];
+                //_sessionTask = [manager GET:self.url.absoluteString parameters:self.parameters
+                //                        progress:nil success:success failure:failure];
                 break;
             case SGHTTPRequestMethodPost:
-                _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
-                                        progress:nil success:success failure:failure];
+                _sessionTask = [manager POST:self.url.absoluteString
+                                  parameters:self.parameters
+                                     headers:nil
+                                    progress:nil
+                                     success:success
+                                     failure:failure];
+                
+                //_sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
+                //                        progress:nil success:success failure:failure];
                 break;
             case SGHTTPRequestMethodMultipartPost:
                 {
                 __weak SGHTTPRequest *me = self;
-                _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
-                   constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+//                    _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
+//                   constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+//                       [formData appendPartWithFileData:me.multiPartData
+//                                                   name:me.multiPartName
+//                                               fileName:me.multiPartFilename
+//                                               mimeType:me.multiPartMimeType];
+//                   } progress:nil success:success failure:failure];
+                    _sessionTask = [manager POST:self.url.absoluteString
+                                      parameters:self.parameters
+                                         headers:nil
+                       constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
                        [formData appendPartWithFileData:me.multiPartData
                                                    name:me.multiPartName
                                                fileName:me.multiPartFilename
@@ -270,16 +298,31 @@ void doOnMain(void(^block)(void)) {
                  }
                 break;
             case SGHTTPRequestMethodDelete:
+//                _sessionTask = [manager DELETE:self.url.absoluteString
+//                                        parameters:self.parameters success:success failure:failure];
                 _sessionTask = [manager DELETE:self.url.absoluteString
-                                        parameters:self.parameters success:success failure:failure];
+                                    parameters:self.parameters
+                                       headers:nil
+                                       success:success
+                                       failure:failure];
                 break;
             case SGHTTPRequestMethodPut:
+//                _sessionTask = [manager PUT:self.url.absoluteString
+//                                        parameters:self.parameters success:success failure:failure];
                 _sessionTask = [manager PUT:self.url.absoluteString
-                                        parameters:self.parameters success:success failure:failure];
+                                 parameters:self.parameters
+                                    headers:nil
+                                    success:success
+                                    failure:failure];
                 break;
             case SGHTTPRequestMethodPatch:
+//                _sessionTask = [manager PATCH:self.url.absoluteString
+//                                        parameters:self.parameters success:success failure:failure];
                 _sessionTask = [manager PATCH:self.url.absoluteString
-                                        parameters:self.parameters success:success failure:failure];
+                                   parameters:self.parameters
+                                      headers:nil
+                                      success:success
+                                      failure:failure];
                 break;
         }
     }
@@ -424,6 +467,9 @@ void doOnMain(void(^block)(void)) {
     
     self.responseData = responseData;
     self.responseString = responseString;
+    if(self.responseString != nil) {
+        NSLog(@"BRIAN! Response String: %@", self.responseString);
+    }
     self.statusCode = ((NSHTTPURLResponse*)task.response).statusCode;
     if (!self.cancelled) {
         if (self.logResponses) {

@@ -11,7 +11,7 @@
 #pragma mark DataSource protocol to supply network stubs for testing
 @protocol SGNetworkStubsDataSource
 
-- (nullable NSString *)stubWithURL:(nonnull NSURL *)url;
+- (nullable NSString *)stubForURL:(nonnull NSURL *)url;
 
 @end
 
