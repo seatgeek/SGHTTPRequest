@@ -232,16 +232,12 @@ void doOnMain(void(^block)(void)) {
                 [self failedWithError:error task:task retryURL:baseURL];
             }
         };
-        
-        // BREAK FOR TESTING
 
+#pragma mark - Network Stubbing Hook
         if (SGHTTPRequest.isCurrentlyTesting) {
-            // not sure if i need the if? Just playing around rn
-            if(_stubsDataSource != nil) {
-                NSLog(@"SGHTTPRequest _stubsDataSource stubForURL: %@", [_stubsDataSource stubForURL:self.url]);
-                //[self success:nil responseObject:[_stubsDataSource stubForURL:self.url]];
-            }
-            //return;
+            NSAssert(_stubsDataSource != nil, @"SGHTTPRequest is missing _stubsDataSource injection.");
+            [self success:nil responseObject:[_stubsDataSource stubForURL:self.url]];
+            return;
         }
         
         switch (self.method) {
