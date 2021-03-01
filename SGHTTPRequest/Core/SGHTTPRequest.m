@@ -61,14 +61,13 @@ void doOnMain(void(^block)(void)) {
 
 #pragma mark - Public
 
-+ (BOOL)isRunningInTest {
-    static BOOL isTest;
++ (BOOL)isCurrentlyTesting {
+    static BOOL testing;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        isTest = YES; // hijack for testing to test to test when testing
-        //isTest = [NSProcessInfo.processInfo.environment[@"SG_IS_TESTING"] boolValue];   // declared in the test environment var
+        testing = [NSProcessInfo.processInfo.environment[@"SG_IS_TESTING"] boolValue];   // declared in the SeatGeek Test scheme
     });
-    return isTest;
+    return testing;
 }
 
 + (SGHTTPRequest *)requestWithURL:(NSURL *)url {
@@ -120,12 +119,6 @@ void doOnMain(void(^block)(void)) {
     SGHTTPRequest *request =  [[self alloc] initWithURL:url method:SGHTTPRequestMethodGet];
     request.responseFormat = SGHTTPDataTypeXML;
     return request;
-}
-
-+ (NSString *)stubForURL:(NSURL *)url {
-    //switch all the URLs
-    NSLog(@"STUB STUB STUB STUB STUB STUBBING! FART FART URL: %@", url);
-    return @"{}";
 }
 
 - (void)start {
@@ -242,53 +235,36 @@ void doOnMain(void(^block)(void)) {
         
         // BREAK FOR TESTING
 
-        if (SGHTTPRequest.isRunningInTest) {
-            //[self success:nil responseObject:[_stubsDataSource stubForURL:self.url record:NO]];
+        if (SGHTTPRequest.isCurrentlyTesting) {
             // not sure if i need the if? Just playing around rn
             if(_stubsDataSource != nil) {
                 NSLog(@"SGHTTPRequest _stubsDataSource stubForURL: %@", [_stubsDataSource stubForURL:self.url]);
-                //[self success:nil responseObject:[_stubsDataSource stubForURL:self.url record:TRUE]];
+                //[self success:nil responseObject:[_stubsDataSource stubForURL:self.url]];
             }
             //return;
         }
         
         switch (self.method) {
             case SGHTTPRequestMethodGet:
-                //FIXME: - Make sure these work?
-                // This is the updated signature. Should we? Let's come back...
                 _sessionTask = [manager GET:self.url.absoluteString
                                  parameters:self.parameters
-                                    headers:nil
                                    progress:nil
                                     success:success
                                     failure:failure];
-                //_sessionTask = [manager GET:self.url.absoluteString parameters:self.parameters
-                //                        progress:nil success:success failure:failure];
                 break;
             case SGHTTPRequestMethodPost:
                 _sessionTask = [manager POST:self.url.absoluteString
                                   parameters:self.parameters
-                                     headers:nil
                                     progress:nil
                                      success:success
                                      failure:failure];
                 
-                //_sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
-                //                        progress:nil success:success failure:failure];
                 break;
             case SGHTTPRequestMethodMultipartPost:
                 {
                 __weak SGHTTPRequest *me = self;
-//                    _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
-//                   constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
-//                       [formData appendPartWithFileData:me.multiPartData
-//                                                   name:me.multiPartName
-//                                               fileName:me.multiPartFilename
-//                                               mimeType:me.multiPartMimeType];
-//                   } progress:nil success:success failure:failure];
                     _sessionTask = [manager POST:self.url.absoluteString
                                       parameters:self.parameters
-                                         headers:nil
                        constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
                        [formData appendPartWithFileData:me.multiPartData
                                                    name:me.multiPartName
@@ -298,29 +274,20 @@ void doOnMain(void(^block)(void)) {
                  }
                 break;
             case SGHTTPRequestMethodDelete:
-//                _sessionTask = [manager DELETE:self.url.absoluteString
-//                                        parameters:self.parameters success:success failure:failure];
                 _sessionTask = [manager DELETE:self.url.absoluteString
                                     parameters:self.parameters
-                                       headers:nil
                                        success:success
                                        failure:failure];
                 break;
             case SGHTTPRequestMethodPut:
-//                _sessionTask = [manager PUT:self.url.absoluteString
-//                                        parameters:self.parameters success:success failure:failure];
                 _sessionTask = [manager PUT:self.url.absoluteString
                                  parameters:self.parameters
-                                    headers:nil
                                     success:success
                                     failure:failure];
                 break;
             case SGHTTPRequestMethodPatch:
-//                _sessionTask = [manager PATCH:self.url.absoluteString
-//                                        parameters:self.parameters success:success failure:failure];
                 _sessionTask = [manager PATCH:self.url.absoluteString
                                    parameters:self.parameters
-                                      headers:nil
                                       success:success
                                       failure:failure];
                 break;
