@@ -61,13 +61,13 @@ void doOnMain(void(^block)(void)) {
 
 #pragma mark - Public
 
-+ (BOOL)isCurrentlyTesting {
-    static BOOL testing;
++ (BOOL)isUITesting {
+    static BOOL uiTesting;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        testing = [NSProcessInfo.processInfo.environment[@"SG_IS_TESTING"] boolValue];   // declared in the SeatGeek Test schemes
+        uiTesting = [NSProcessInfo.processInfo.environment[@"IS_UI_TESTING"] boolValue];   // declared in SeatGeek -> UITests.xctestplan
     });
-    return testing;
+    return uiTesting;
 }
 
 + (SGHTTPRequest *)requestWithURL:(NSURL *)url {
@@ -234,10 +234,9 @@ void doOnMain(void(^block)(void)) {
         };
 
 #pragma mark - Network Stubbing Hook
-        // In testing schemes, we bypass calling AFHTTPSessionManager altogether
+        // In UITests, we will bypass calling AFHTTPSessionManager altogether
         // The content provided here will be a work in progress until UITests are completed
-        // Currently, with this stub activated, we do not hit the server at all in our tests!
-        if (SGHTTPRequest.isCurrentlyTesting) {
+        if (SGHTTPRequest.isUITesting) {
             NSAssert(_stubsDataSource != nil, @"SGHTTPRequest is missing _stubsDataSource injection.");
             [self success:nil responseObject:[_stubsDataSource stubForURL:self.url]];
             return;
