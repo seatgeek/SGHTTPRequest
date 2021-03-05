@@ -839,7 +839,7 @@ static NSDictionary *gGlobalRequestHeaders = nil;
     return self.logging & SGHTTPLogResponses;
 }
 
-#pragma mark - Network Stub Data Source Injection
+#pragma mark - Network Stub Data Source Injection (UITests support)
 static id<SGNetworkStubsDataSource>_Nullable _stubsDataSource = nil;
 
 + (void)setNetworkStubsDataSource:(id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource {
