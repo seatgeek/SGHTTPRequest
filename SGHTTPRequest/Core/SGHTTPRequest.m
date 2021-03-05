@@ -65,7 +65,7 @@ void doOnMain(void(^block)(void)) {
     static BOOL testing;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        testing = [NSProcessInfo.processInfo.environment[@"SG_IS_TESTING"] boolValue];   // declared in the SeatGeek Test scheme
+        testing = [NSProcessInfo.processInfo.environment[@"SG_IS_TESTING"] boolValue];   // declared in the SeatGeek Test schemes
     });
     return testing;
 }
@@ -191,9 +191,9 @@ void doOnMain(void(^block)(void)) {
                     break;
                 default:
                     noContent = NO;
-            }            
+            }
             if (noContent) {
-                responseObject = nil;   // AFNetworking returns a silly 
+                responseObject = nil;   // AFNetworking returns a silly
             } else {
                 // check that we got the correct content type.
                 switch (self.responseFormat) {
@@ -234,6 +234,9 @@ void doOnMain(void(^block)(void)) {
         };
 
 #pragma mark - Network Stubbing Hook
+        // In testing schemes, we bypass calling AFHTTPSessionManager altogether
+        // The content provided here will be a work in progress until UITests are completed
+        // Currently, with this stub activated, we do not hit the server at all in our tests!
         if (SGHTTPRequest.isCurrentlyTesting) {
             NSAssert(_stubsDataSource != nil, @"SGHTTPRequest is missing _stubsDataSource injection.");
             [self success:nil responseObject:[_stubsDataSource stubForURL:self.url]];
@@ -430,9 +433,7 @@ void doOnMain(void(^block)(void)) {
     
     self.responseData = responseData;
     self.responseString = responseString;
-    if(self.responseString != nil) {
-        NSLog(@"BRIAN! Response String: %@", self.responseString);
-    }
+    
     self.statusCode = ((NSHTTPURLResponse*)task.response).statusCode;
     if (!self.cancelled) {
         if (self.logResponses) {
