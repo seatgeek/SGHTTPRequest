@@ -372,6 +372,4 @@ a new identical request.
 
 @property (class, nonatomic, assign) id<SGNetworkStubsDataSource>_Nullable networkStubsDataSource;
 
-+ (void)setNetworkStubsDataSource:(id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource;
-+ (id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource;
 @end

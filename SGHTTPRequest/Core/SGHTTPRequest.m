@@ -58,6 +58,7 @@ void doOnMain(void(^block)(void)) {
 }
 
 @implementation SGHTTPRequest
+@dynamic networkStubsDataSource;
 
 #pragma mark - Public
 
@@ -237,8 +238,8 @@ void doOnMain(void(^block)(void)) {
         // In UITests, we will bypass calling AFHTTPSessionManager altogether
         // The content provided here will be a work in progress until UITests are completed
         if (SGHTTPRequest.isUITesting) {
-            NSAssert(_stubsDataSource != nil, @"SGHTTPRequest is missing _stubsDataSource injection.");
-            [self success:nil responseObject:[_stubsDataSource stubForURL:self.url]];
+            NSAssert(SGHTTPRequest.networkStubsDataSource != nil, @"SGHTTPRequest is missing _stubsDataSource injection.");
+            [self success:nil responseObject:[SGHTTPRequest.networkStubsDataSource stubForURL:self.url]];
             return;
         }
         
@@ -837,17 +838,6 @@ static NSDictionary *gGlobalRequestHeaders = nil;
 
 - (BOOL)logResponses {
     return self.logging & SGHTTPLogResponses;
-}
-
-#pragma mark - Network Stub Data Source Injection (UITests support)
-static id<SGNetworkStubsDataSource>_Nullable _stubsDataSource = nil;
-
-+ (void)setNetworkStubsDataSource:(id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource {
-    _stubsDataSource = networkStubsDataSource;
-}
-
-+ (id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource {
-    return _stubsDataSource;
 }
 
 @end
