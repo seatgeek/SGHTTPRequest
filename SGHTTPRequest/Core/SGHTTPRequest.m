@@ -65,7 +65,7 @@ void doOnMain(void(^block)(void)) {
     static BOOL uiTesting;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        uiTesting = [NSProcessInfo.processInfo.environment[@"IS_UI_TESTING"] boolValue];   // declared in SeatGeek -> UITests.xctestplan
+        uiTesting = [NSProcessInfo.processInfo.arguments containsObject:@"ui_tests"]; // declared as `LaunchArgs.UITest` in Seatgeek
     });
     return uiTesting;
 }
