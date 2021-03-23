@@ -19,6 +19,7 @@
 #import "SGHTTPRequestDebug.h"
 #import "NSString+SGHTTPRequest.h"
 #import <SGHTTPRequest/SGFileCache.h>
+#import "SGNetworkStubsDataSource.h"
 #import "MGEvents.h"
 
 #define SGETag              @"eTag"
@@ -59,6 +60,15 @@ void doOnMain(void(^block)(void)) {
 @implementation SGHTTPRequest
 
 #pragma mark - Public
+
++ (BOOL)isUITesting {
+    static BOOL uiTesting;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        uiTesting = [NSProcessInfo.processInfo.arguments containsObject:@"ui_tests"]; // declared as `LaunchArgs.UITest` in Seatgeek
+    });
+    return uiTesting;
+}
 
 + (SGHTTPRequest *)requestWithURL:(NSURL *)url {
     return [[self alloc] initWithURL:url method:SGHTTPRequestMethodGet];
@@ -181,9 +191,9 @@ void doOnMain(void(^block)(void)) {
                     break;
                 default:
                     noContent = NO;
-            }            
+            }
             if (noContent) {
-                responseObject = nil;   // AFNetworking returns a silly 
+                responseObject = nil;   // AFNetworking returns a silly
             } else {
                 // check that we got the correct content type.
                 switch (self.responseFormat) {
@@ -223,20 +233,37 @@ void doOnMain(void(^block)(void)) {
             }
         };
 
+#pragma mark - Network Stubbing Hook
+        // In UITests, we will bypass calling AFHTTPSessionManager altogether
+        // The content provided here will be a work in progress until UITests are completed
+        if (SGHTTPRequest.isUITesting) {
+            NSAssert(_stubsDataSource != nil, @"SGHTTPRequest is missing _stubsDataSource injection.");
+            [self success:nil responseObject:[_stubsDataSource stubForURL:self.url parameters:self.parameters]];
+            return;
+        }
+        
         switch (self.method) {
             case SGHTTPRequestMethodGet:
-                _sessionTask = [manager GET:self.url.absoluteString parameters:self.parameters
-                                        progress:nil success:success failure:failure];
+                _sessionTask = [manager GET:self.url.absoluteString
+                                 parameters:self.parameters
+                                   progress:nil
+                                    success:success
+                                    failure:failure];
                 break;
             case SGHTTPRequestMethodPost:
-                _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
-                                        progress:nil success:success failure:failure];
+                _sessionTask = [manager POST:self.url.absoluteString
+                                  parameters:self.parameters
+                                    progress:nil
+                                     success:success
+                                     failure:failure];
+                
                 break;
             case SGHTTPRequestMethodMultipartPost:
                 {
                 __weak SGHTTPRequest *me = self;
-                _sessionTask = [manager POST:self.url.absoluteString parameters:self.parameters
-                   constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+                    _sessionTask = [manager POST:self.url.absoluteString
+                                      parameters:self.parameters
+                       constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
                        [formData appendPartWithFileData:me.multiPartData
                                                    name:me.multiPartName
                                                fileName:me.multiPartFilename
@@ -246,15 +273,21 @@ void doOnMain(void(^block)(void)) {
                 break;
             case SGHTTPRequestMethodDelete:
                 _sessionTask = [manager DELETE:self.url.absoluteString
-                                        parameters:self.parameters success:success failure:failure];
+                                    parameters:self.parameters
+                                       success:success
+                                       failure:failure];
                 break;
             case SGHTTPRequestMethodPut:
                 _sessionTask = [manager PUT:self.url.absoluteString
-                                        parameters:self.parameters success:success failure:failure];
+                                 parameters:self.parameters
+                                    success:success
+                                    failure:failure];
                 break;
             case SGHTTPRequestMethodPatch:
                 _sessionTask = [manager PATCH:self.url.absoluteString
-                                        parameters:self.parameters success:success failure:failure];
+                                   parameters:self.parameters
+                                      success:success
+                                      failure:failure];
                 break;
         }
     }
@@ -399,6 +432,7 @@ void doOnMain(void(^block)(void)) {
     
     self.responseData = responseData;
     self.responseString = responseString;
+    
     self.statusCode = ((NSHTTPURLResponse*)task.response).statusCode;
     if (!self.cancelled) {
         if (self.logResponses) {
@@ -803,6 +837,17 @@ static NSDictionary *gGlobalRequestHeaders = nil;
 
 - (BOOL)logResponses {
     return self.logging & SGHTTPLogResponses;
+}
+
+#pragma mark - Network Stub Data Source Injection (UITests support)
+static id<SGNetworkStubsDataSource>_Nullable _stubsDataSource = nil;
+
++ (void)setNetworkStubsDataSource:(id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource {
+    _stubsDataSource = networkStubsDataSource;
+}
+
++ (id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource {
+    return _stubsDataSource;
 }
 
 @end
