@@ -239,7 +239,7 @@ void doOnMain(void(^block)(void)) {
         // The content provided here will be a work in progress until UITests are completed
         if (SGHTTPRequest.isUITesting) {
             NSAssert(SGHTTPRequest.networkStubsDataSource != nil, @"SGHTTPRequest is missing _stubsDataSource injection.");
-            [self success:nil responseObject:[SGHTTPRequest.networkStubsDataSource stubForURL:self.url]];
+            [self success:nil responseObject:[SGHTTPRequest.networkStubsDataSource stubForURL:self.url parameters:self.parameters]];
             return;
         }
         

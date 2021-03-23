@@ -12,7 +12,7 @@
 @protocol SGNetworkStubsDataSource
 
 // Using id here to keep the expected responseObject ready to propagate through success/failure blocks
-- (nullable id)stubForURL:(nonnull NSURL *)url;
+- (nullable id)stubForURL:(nonnull NSURL *)url parameters:(nullable NSObject *)parameters;
 
 @end
 
