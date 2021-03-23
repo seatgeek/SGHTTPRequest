@@ -371,5 +371,7 @@ a new identical request.
 #pragma mark Network Stubbing Data Source Injection
 
 @property (class, nonatomic, assign) id<SGNetworkStubsDataSource>_Nullable networkStubsDataSource;
++ (void)setNetworkStubsDataSource:(id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource;
++ (id<SGNetworkStubsDataSource>_Nullable)networkStubsDataSource;
 
 @end
